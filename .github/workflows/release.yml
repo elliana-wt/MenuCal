@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-26
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Run tests
+        run: swift test --arch arm64
+
+      - name: Build Apple Silicon application
+        env:
+          CONFIGURATION: release
+        run: ./script/build_and_run.sh --package
+
+      - name: Verify arm64 application
+        run: |
+          file dist/MenuCal.app/Contents/MacOS/MenuCal
+          lipo -info dist/MenuCal.app/Contents/MacOS/MenuCal | grep arm64
+          codesign --verify --deep --strict --verbose=2 dist/MenuCal.app
+
+      - name: Package release files
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent dist/MenuCal.app dist/MenuCal-arm64.zip
+          shasum -a 256 dist/MenuCal-arm64.zip > dist/MenuCal-arm64.zip.sha256
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            dist/MenuCal-arm64.zip \
+            dist/MenuCal-arm64.zip.sha256 \
+            --title "MenuCal $GITHUB_REF_NAME" \
+            --generate-notes
