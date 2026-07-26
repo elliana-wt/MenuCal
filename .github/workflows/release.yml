@@ -32,7 +32,8 @@ jobs:
       - name: Package release files
         run: |
           ditto -c -k --sequesterRsrc --keepParent dist/MenuCal.app dist/MenuCal-arm64.zip
-          shasum -a 256 dist/MenuCal-arm64.zip > dist/MenuCal-arm64.zip.sha256
+          cd dist
+          shasum -a 256 MenuCal-arm64.zip > MenuCal-arm64.zip.sha256
 
       - name: Publish GitHub Release
         env:
