@@ -1,0 +1,115 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "display-p3:1.00000,1.00000,1.00000,1.00000",
+      "display-p3:0.90000,0.90000,0.90000,1.00000"
+    ]
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "glass-specializations" : [
+            {
+              "value" : false
+            },
+            {
+              "appearance" : "dark",
+              "value" : false
+            },
+            {
+              "appearance" : "tinted",
+              "value" : false
+            }
+          ],
+          "hidden" : false,
+          "image-name" : "MenuCal.png",
+          "name" : "MenuCal",
+          "position" : {
+            "scale" : 0.29,
+            "translation-in-points" : [
+              0,
+              -318
+            ]
+          }
+        },
+        {
+          "hidden" : false,
+          "image-name" : "编组 12.png",
+          "name" : "编组 12",
+          "position" : {
+            "scale" : 1.22,
+            "translation-in-points" : [
+              0,
+              163
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "solid" : "display-p3:0.33852,0.33852,0.33852,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "solid" : "display-p3:0.75053,0.75053,0.75053,1.00000"
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "solid" : "display-p3:0.65078,0.65078,0.65078,1.00000"
+              }
+            }
+          ],
+          "glass" : false,
+          "image-name" : "编组 11.png",
+          "name" : "编组 11",
+          "position" : {
+            "scale" : 1.22,
+            "translation-in-points" : [
+              0,
+              163
+            ]
+          }
+        },
+        {
+          "glass-specializations" : [
+            {
+              "value" : true
+            },
+            {
+              "appearance" : "dark",
+              "value" : true
+            }
+          ],
+          "image-name" : "矩形 2 2 2.png",
+          "name" : "矩形 2 2 2",
+          "position" : {
+            "scale" : 1.51,
+            "translation-in-points" : [
+              0,
+              -369
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : [
+      "macOS"
+    ]
+  }
+}

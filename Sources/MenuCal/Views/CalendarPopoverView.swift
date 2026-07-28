@@ -7,6 +7,14 @@ struct CalendarPopoverView: View {
     @State private var selectedDate: Date
     @State private var displayedMonth: Date
     @State private var automationError: String?
+    @AppStorage(PreferenceKeys.calendarDayHorizontalSpacingPixels)
+    private var dayHorizontalSpacingPixels =
+        PreferenceKeys.defaultCalendarDayHorizontalSpacingPixels
+    @AppStorage(PreferenceKeys.calendarDayVerticalSpacingPixels)
+    private var dayVerticalSpacingPixels =
+        PreferenceKeys.defaultCalendarDayVerticalSpacingPixels
+    @AppStorage(PreferenceKeys.calendarShowsEvents)
+    private var showsEvents = PreferenceKeys.defaultCalendarShowsEvents
 
     private let calendar = Calendar.autoupdatingCurrent
     private let calendarOpener: any CalendarOpening
@@ -37,25 +45,32 @@ struct CalendarPopoverView: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 10)
 
-            Divider()
+            if showsEvents {
+                EventListView(
+                    selectedDate: selectedDate,
+                    store: store,
+                    onOpenEvent: openEvent
+                )
+                .frame(height: CalendarLayoutMetrics.eventListHeight)
+            }
 
-            EventListView(
-                selectedDate: selectedDate,
-                store: store,
-                onOpenEvent: openEvent
-            )
-
             Divider()
+                .padding(.horizontal, 18)
 
             footer
         }
-        .frame(width: 360, height: 560)
-        .background(.regularMaterial)
+        .frame(width: popoverWidth, height: popoverHeight)
+        .calendarPopoverSurface()
         .task {
-            store.refresh(for: selectedDate, calendar: calendar)
+            refreshEventsIfShown()
         }
         .onChange(of: selectedDate) { _, newDate in
-            store.refresh(for: newDate, calendar: calendar)
+            refreshEventsIfShown(for: newDate)
+        }
+        .onChange(of: showsEvents) { _, isShown in
+            if isShown {
+                store.refresh(for: selectedDate, calendar: calendar)
+            }
         }
         .alert(
             "无法打开系统日历",
@@ -91,8 +106,29 @@ struct CalendarPopoverView: View {
         }
         .font(.system(size: 12))
         .foregroundStyle(.secondary)
+        .controlSize(.small)
         .padding(.horizontal, 18)
         .frame(height: 42)
+    }
+
+    private var popoverWidth: CGFloat {
+        CalendarLayoutMetrics.popoverWidth(
+            horizontalSpacingPixels: dayHorizontalSpacingPixels
+        )
+    }
+
+    private var popoverHeight: CGFloat {
+        CalendarLayoutMetrics.popoverHeight(
+            verticalSpacingPixels: dayVerticalSpacingPixels,
+            showsEvents: showsEvents
+        )
+    }
+
+    private func refreshEventsIfShown(for date: Date? = nil) {
+        guard showsEvents else {
+            return
+        }
+        store.refresh(for: date ?? selectedDate, calendar: calendar)
     }
 
     private func moveMonth(by offset: Int) {
@@ -134,7 +170,7 @@ private struct CalendarHeaderView: View {
     var body: some View {
         HStack {
             Text(displayedMonth, format: .dateTime.year().month(.wide))
-                .font(.system(size: 22, weight: .semibold))
+                .font(.system(size: 18, weight: .semibold))
 
             Spacer()
 
@@ -144,7 +180,7 @@ private struct CalendarHeaderView: View {
             .help("上个月")
 
             Button(action: goToToday) {
-                Image(systemName: "circle.circle")
+                Image(systemName: "smallcircle.filled.circle")
             }
             .help("回到今天")
 
@@ -153,7 +189,7 @@ private struct CalendarHeaderView: View {
             }
             .help("下个月")
         }
-        .buttonStyle(.borderless)
+        .buttonStyle(.plain)
         .font(.system(size: 14, weight: .semibold))
         .padding(.horizontal, 18)
         .frame(height: 56)
@@ -165,6 +201,16 @@ private struct MonthGridView: View {
     let selectedDate: Date
     let calendar: Calendar
     let onSelect: (Date) -> Void
+    @AppStorage(PreferenceKeys.calendarDayFontSizePixels)
+    private var dayFontSizePixels = PreferenceKeys.defaultCalendarDayFontSizePixels
+    @AppStorage(PreferenceKeys.calendarDayVerticalSpacingPixels)
+    private var dayVerticalSpacingPixels =
+        PreferenceKeys.defaultCalendarDayVerticalSpacingPixels
+    @AppStorage(PreferenceKeys.calendarDayHorizontalSpacingPixels)
+    private var dayHorizontalSpacingPixels =
+        PreferenceKeys.defaultCalendarDayHorizontalSpacingPixels
+    @AppStorage(PreferenceKeys.calendarHighlightColor)
+    private var highlightColorStorageValue = PreferenceKeys.defaultCalendarHighlightColor
 
     private var builder: CalendarGridBuilder {
         CalendarGridBuilder(calendar: calendar)
@@ -172,16 +218,20 @@ private struct MonthGridView: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            LazyVGrid(columns: columns, spacing: 0) {
+            LazyVGrid(columns: columns, alignment: .center, spacing: 0) {
                 ForEach(Array(builder.weekdaySymbols().enumerated()), id: \.offset) { _, symbol in
                     Text(symbol)
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, minHeight: 22)
+                        .frame(width: dayCellSize, height: 22)
                 }
             }
 
-            LazyVGrid(columns: columns, spacing: 2) {
+            LazyVGrid(
+                columns: columns,
+                alignment: .center,
+                spacing: dayVerticalSpacing
+            ) {
                 ForEach(builder.days(containing: displayedMonth)) { day in
                     dayButton(day)
                 }
@@ -190,8 +240,54 @@ private struct MonthGridView: View {
     }
 
     private var columns: [GridItem] {
-        Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
+        Array(
+            repeating: GridItem(.fixed(dayCellSize), spacing: dayHorizontalSpacing),
+            count: 7
+        )
     }
+
+    private var dayFontSize: CGFloat {
+        PreferenceKeys.points(
+            fromPixels: min(
+                PreferenceKeys.maximumCalendarDayFontSizePixels,
+                max(PreferenceKeys.minimumCalendarDayFontSizePixels, dayFontSizePixels)
+            )
+        )
+    }
+
+    private var dayVerticalSpacing: CGFloat {
+        PreferenceKeys.points(
+            fromPixels: min(
+                PreferenceKeys.maximumCalendarDayVerticalSpacingPixels,
+                max(
+                    PreferenceKeys.minimumCalendarDayVerticalSpacingPixels,
+                    dayVerticalSpacingPixels
+                )
+            )
+        )
+    }
+
+    private var dayHorizontalSpacing: CGFloat {
+        PreferenceKeys.points(
+            fromPixels: min(
+                PreferenceKeys.maximumCalendarDayHorizontalSpacingPixels,
+                max(
+                    PreferenceKeys.minimumCalendarDayHorizontalSpacingPixels,
+                    dayHorizontalSpacingPixels
+                )
+            )
+        )
+    }
+
+    private var highlightColor: Color {
+        CalendarHighlightColor.color(from: highlightColorStorageValue)
+    }
+
+    private var highlightForegroundColor: Color {
+        CalendarHighlightColor.foregroundColor(from: highlightColorStorageValue)
+    }
+
+    private let dayCellSize: CGFloat = 32
 
     private func dayButton(_ day: CalendarDay) -> some View {
         let isSelected = calendar.isDate(day.date, inSameDayAs: selectedDate)
@@ -200,9 +296,14 @@ private struct MonthGridView: View {
             onSelect(day.date)
         } label: {
             Text(String(calendar.component(.day, from: day.date)))
-                .font(.system(size: 14, weight: day.isToday || isSelected ? .semibold : .regular))
+                .font(
+                    .system(
+                        size: dayFontSize,
+                        weight: day.isToday || isSelected ? .semibold : .regular
+                    )
+                )
                 .foregroundStyle(foregroundStyle(for: day, isSelected: isSelected))
-                .frame(width: 32, height: 32)
+                .frame(width: dayCellSize, height: dayCellSize)
                 .background {
                     Circle()
                         .fill(backgroundStyle(for: day, isSelected: isSelected))
@@ -210,23 +311,22 @@ private struct MonthGridView: View {
                 .contentShape(Circle())
         }
         .buttonStyle(.plain)
-        .frame(maxWidth: .infinity, minHeight: 34)
         .help(day.date.formatted(date: .long, time: .omitted))
     }
 
     private func foregroundStyle(for day: CalendarDay, isSelected: Bool) -> Color {
         if isSelected || day.isToday {
-            return .white
+            return highlightForegroundColor
         }
         return day.isInDisplayedMonth ? .primary : .secondary.opacity(0.55)
     }
 
     private func backgroundStyle(for day: CalendarDay, isSelected: Bool) -> Color {
         if isSelected {
-            return .accentColor
+            return highlightColor
         }
         if day.isToday {
-            return .accentColor.opacity(0.72)
+            return highlightColor.opacity(0.72)
         }
         return .clear
     }
@@ -260,11 +360,11 @@ private struct EventListView: View {
     }
 
     private var permissionPrompt: some View {
-        ContentUnavailableView {
-            Label("显示系统日程", systemImage: "calendar.badge.clock")
-        } description: {
-            Text("允许 MenuCal 读取日历后，这里会显示所选日期的事件。")
-        } actions: {
+        CalendarUnavailableView(
+            title: "显示日程",
+            systemImage: "calendar.badge.clock",
+            description: "允许 MenuCal 读取系统日历后，\n这里会显示所选日期的事件。"
+        ) {
             Button("允许读取日历") {
                 Task {
                     await store.requestAccess(for: selectedDate)
@@ -276,11 +376,11 @@ private struct EventListView: View {
     }
 
     private var deniedPrompt: some View {
-        ContentUnavailableView {
-            Label("无法读取日历", systemImage: "calendar.badge.exclamationmark")
-        } description: {
-            Text("请在系统设置的“隐私与安全性”中允许 MenuCal 访问日历。")
-        } actions: {
+        CalendarUnavailableView(
+            title: "无法读取日历",
+            systemImage: "calendar.badge.exclamationmark",
+            description: "请在系统设置的“隐私与安全性”中\n允许 MenuCal 访问日历。"
+        ) {
             Button("打开系统设置") {
                 SystemSettingsOpener.openCalendarPrivacy()
             }
@@ -292,11 +392,13 @@ private struct EventListView: View {
         if store.isLoading {
             ProgressView()
         } else if store.events.isEmpty {
-            ContentUnavailableView(
-                "没有日程",
+            CalendarUnavailableView(
+                title: "没有日程",
                 systemImage: "calendar",
-                description: Text("这一天暂时没有安排。")
-            )
+                description: "这一天暂时没有安排"
+            ) {
+                EmptyView()
+            }
         } else {
             ScrollView {
                 LazyVStack(spacing: 2) {
@@ -310,6 +412,48 @@ private struct EventListView: View {
                 .padding(.bottom, 8)
             }
         }
+    }
+}
+
+private struct CalendarUnavailableView<Actions: View>: View {
+    let title: String
+    let systemImage: String
+    let description: String
+    private let actions: Actions
+
+    init(
+        title: String,
+        systemImage: String,
+        description: String,
+        @ViewBuilder actions: () -> Actions
+    ) {
+        self.title = title
+        self.systemImage = systemImage
+        self.description = description
+        self.actions = actions()
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Image(systemName: systemImage)
+                .font(.system(size: 28, weight: .regular))
+                .foregroundStyle(.secondary)
+                .frame(width: 32, height: 32)
+                .padding(.bottom, 10)
+
+            Text(title)
+                .font(.system(size: 20, weight: .semibold))
+
+            Text(description)
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.top, 8)
+
+            actions
+                .padding(.top, 14)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
@@ -372,3 +516,125 @@ private extension CalendarColor {
         Color(red: red, green: green, blue: blue, opacity: alpha)
     }
 }
+
+private extension View {
+    @ViewBuilder
+    func calendarPopoverSurface() -> some View {
+        if #available(macOS 26.0, *) {
+            self
+        } else {
+            background(.regularMaterial)
+        }
+    }
+}
+
+#if DEBUG
+@MainActor
+private final class PreviewEventProvider: EventProviding {
+    let authorizationStatus: CalendarAuthorization
+    var onEventsChanged: (() -> Void)?
+
+    private let includesEvents: Bool
+
+    init(
+        authorizationStatus: CalendarAuthorization,
+        includesEvents: Bool = false
+    ) {
+        self.authorizationStatus = authorizationStatus
+        self.includesEvents = includesEvents
+    }
+
+    func requestAccess() async -> Bool {
+        authorizationStatus == .fullAccess
+    }
+
+    func events(on date: Date, calendar: Calendar) -> [CalendarEventSummary] {
+        guard includesEvents else {
+            return []
+        }
+
+        let startOfDay = calendar.startOfDay(for: date)
+        let nextDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) ?? date
+        let meetingStart =
+            calendar.date(bySettingHour: 10, minute: 30, second: 0, of: date) ?? date
+        let meetingEnd =
+            calendar.date(byAdding: .minute, value: 45, to: meetingStart) ?? meetingStart
+        let focusStart =
+            calendar.date(bySettingHour: 14, minute: 0, second: 0, of: date) ?? date
+        let focusEnd =
+            calendar.date(byAdding: .hour, value: 2, to: focusStart) ?? focusStart
+
+        return CalendarEventSummary.sortedForDisplay([
+            CalendarEventSummary(
+                id: "preview-all-day",
+                externalIdentifier: nil,
+                title: "产品发布日",
+                startDate: startOfDay,
+                endDate: nextDay,
+                isAllDay: true,
+                location: nil,
+                calendarColor: CalendarColor(
+                    red: 0.96,
+                    green: 0.45,
+                    blue: 0.24,
+                    alpha: 1
+                )
+            ),
+            CalendarEventSummary(
+                id: "preview-meeting",
+                externalIdentifier: nil,
+                title: "界面细节评审",
+                startDate: meetingStart,
+                endDate: meetingEnd,
+                isAllDay: false,
+                location: "会议室 A",
+                calendarColor: .accent
+            ),
+            CalendarEventSummary(
+                id: "preview-focus",
+                externalIdentifier: nil,
+                title: "专注设计时间",
+                startDate: focusStart,
+                endDate: focusEnd,
+                isAllDay: false,
+                location: nil,
+                calendarColor: CalendarColor(
+                    red: 0.55,
+                    green: 0.34,
+                    blue: 0.91,
+                    alpha: 1
+                )
+            ),
+        ])
+    }
+}
+
+@MainActor
+private struct PreviewCalendarOpener: CalendarOpening {
+    func open(_ event: CalendarEventSummary) throws {}
+}
+
+private struct CalendarPopoverView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            CalendarPopoverView(
+                provider: PreviewEventProvider(authorizationStatus: .fullAccess),
+                calendarOpener: PreviewCalendarOpener()
+            )
+            .defaultAppStorage(
+                UserDefaults(suiteName: "com.elliana.MenuCal.preview.calendar.empty")!
+            )
+            .previewDisplayName("日历 · 没有日程")
+
+            CalendarPopoverView(
+                provider: PreviewEventProvider(authorizationStatus: .notDetermined),
+                calendarOpener: PreviewCalendarOpener()
+            )
+            .defaultAppStorage(
+                UserDefaults(suiteName: "com.elliana.MenuCal.preview.calendar.permission")!
+            )
+            .previewDisplayName("日历 · 未授权")
+        }
+    }
+}
+#endif

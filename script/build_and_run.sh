@@ -10,9 +10,32 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST_DIR="$ROOT_DIR/dist"
 APP_BUNDLE="$DIST_DIR/$APP_NAME.app"
 APP_CONTENTS="$APP_BUNDLE/Contents"
-APP_MACOS="$APP_CONTENTS/MacOS"
-APP_BINARY="$APP_MACOS/$APP_NAME"
-INFO_PLIST="$ROOT_DIR/Packaging/Info.plist"
+APP_BINARY="$APP_CONTENTS/MacOS/$APP_NAME"
+XCODE_DERIVED_DIR="$ROOT_DIR/.build/xcode"
+XCODE_PROJECT="$ROOT_DIR/MenuCal.xcodeproj"
+
+case "$CONFIGURATION" in
+  debug|Debug)
+    XCODE_CONFIGURATION="Debug"
+    ;;
+  release|Release)
+    XCODE_CONFIGURATION="Release"
+    ;;
+  *)
+    echo "error: CONFIGURATION must be debug or release" >&2
+    exit 1
+    ;;
+esac
+
+if [[ -x "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild" ]]; then
+  XCODEBUILD=(
+    env
+    DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer"
+    xcodebuild
+  )
+else
+  XCODEBUILD=(xcodebuild)
+fi
 
 pkill -x "$APP_NAME" >/dev/null 2>&1 || true
 for _ in {1..20}; do
@@ -23,18 +46,44 @@ for _ in {1..20}; do
 done
 pkill -9 -x "$APP_NAME" >/dev/null 2>&1 || true
 
-SWIFT_BUILD_ARGS=(--arch arm64 --configuration "$CONFIGURATION")
-swift build "${SWIFT_BUILD_ARGS[@]}"
-BUILD_BINARY="$(swift build "${SWIFT_BUILD_ARGS[@]}" --show-bin-path)/$APP_NAME"
+"${XCODEBUILD[@]}" \
+  -project "$XCODE_PROJECT" \
+  -scheme "$APP_NAME" \
+  -configuration "$XCODE_CONFIGURATION" \
+  -destination "platform=macOS,arch=arm64" \
+  -derivedDataPath "$XCODE_DERIVED_DIR" \
+  CODE_SIGNING_ALLOWED=NO \
+  build
 
 rm -rf "$APP_BUNDLE"
-mkdir -p "$APP_MACOS"
-cp "$BUILD_BINARY" "$APP_BINARY"
-cp "$INFO_PLIST" "$APP_CONTENTS/Info.plist"
-chmod +x "$APP_BINARY"
+mkdir -p "$DIST_DIR"
+/usr/bin/ditto \
+  "$XCODE_DERIVED_DIR/Build/Products/$XCODE_CONFIGURATION/$APP_NAME.app" \
+  "$APP_BUNDLE"
+
+if [[ -n "${APP_VERSION:-}" ]]; then
+  if [[ ! "$APP_VERSION" =~ ^[0-9]+(\.[0-9]+){1,3}$ ]]; then
+    echo "error: APP_VERSION must be a numeric dotted version" >&2
+    exit 1
+  fi
+  /usr/libexec/PlistBuddy \
+    -c "Set :CFBundleShortVersionString $APP_VERSION" \
+    "$APP_CONTENTS/Info.plist"
+fi
+
+if [[ -n "${BUILD_NUMBER:-}" ]]; then
+  if [[ ! "$BUILD_NUMBER" =~ ^[0-9]+$ ]]; then
+    echo "error: BUILD_NUMBER must be numeric" >&2
+    exit 1
+  fi
+  /usr/libexec/PlistBuddy \
+    -c "Set :CFBundleVersion $BUILD_NUMBER" \
+    "$APP_CONTENTS/Info.plist"
+fi
 
 /usr/bin/xattr -cr "$APP_BUNDLE"
-codesign --force --sign - --timestamp=none "$APP_BUNDLE"
+codesign --force --deep --sign - --timestamp=none "$APP_BUNDLE"
+codesign --verify --deep --strict --verbose=2 "$APP_BUNDLE"
 
 if ! file "$APP_BINARY" | grep -q "arm64"; then
   echo "error: packaged binary is not arm64" >&2

@@ -1,0 +1,688 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		100000000000000000000001 /* MenuCalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000001 /* MenuCalApp.swift */; };
+		100000000000000000000002 /* StatusItemController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000002 /* StatusItemController.swift */; };
+		100000000000000000000003 /* CalendarAuthorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000003 /* CalendarAuthorization.swift */; };
+		100000000000000000000004 /* CalendarDay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000004 /* CalendarDay.swift */; };
+		100000000000000000000005 /* CalendarEventSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000005 /* CalendarEventSummary.swift */; };
+		100000000000000000000006 /* CalendarAutomationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000006 /* CalendarAutomationService.swift */; };
+		100000000000000000000007 /* CalendarOpening.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000007 /* CalendarOpening.swift */; };
+		100000000000000000000008 /* EventKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000008 /* EventKitService.swift */; };
+		100000000000000000000009 /* EventProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000009 /* EventProviding.swift */; };
+		10000000000000000000000A /* LoginItemManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000A /* LoginItemManaging.swift */; };
+		10000000000000000000000B /* SMLoginItemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000B /* SMLoginItemManager.swift */; };
+		10000000000000000000000C /* CalendarStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000C /* CalendarStore.swift */; };
+		10000000000000000000000D /* LoginItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000D /* LoginItemViewModel.swift */; };
+		10000000000000000000000E /* AppleScriptEscaper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000E /* AppleScriptEscaper.swift */; };
+		10000000000000000000000F /* CalendarGridBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000000F /* CalendarGridBuilder.swift */; };
+		100000000000000000000010 /* CalendarHighlightColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000010 /* CalendarHighlightColor.swift */; };
+		100000000000000000000011 /* CalendarLayoutMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000011 /* CalendarLayoutMetrics.swift */; };
+		100000000000000000000012 /* ClockFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000012 /* ClockFormatter.swift */; };
+		100000000000000000000013 /* PreferenceKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000013 /* PreferenceKeys.swift */; };
+		100000000000000000000014 /* SystemSettingsOpener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000014 /* SystemSettingsOpener.swift */; };
+		100000000000000000000015 /* CalendarPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000015 /* CalendarPopoverView.swift */; };
+		100000000000000000000016 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000016 /* SettingsView.swift */; };
+		100000000000000000000017 /* AppRelease.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000017 /* AppRelease.swift */; };
+		100000000000000000000018 /* AppUpdating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000018 /* AppUpdating.swift */; };
+		100000000000000000000019 /* AppUpdateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000019 /* AppUpdateService.swift */; };
+		10000000000000000000001A /* AppUpdateViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000000000000000000001A /* AppUpdateViewModel.swift */; };
+		100000000000000000000101 /* AppleScriptEscaperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000101 /* AppleScriptEscaperTests.swift */; };
+		100000000000000000000102 /* CalendarAutomationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000102 /* CalendarAutomationServiceTests.swift */; };
+		100000000000000000000103 /* CalendarEventSummaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000103 /* CalendarEventSummaryTests.swift */; };
+		100000000000000000000104 /* CalendarGridBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000104 /* CalendarGridBuilderTests.swift */; };
+		100000000000000000000105 /* CalendarStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000105 /* CalendarStoreTests.swift */; };
+		100000000000000000000106 /* ClockFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000106 /* ClockFormatterTests.swift */; };
+		100000000000000000000107 /* PreferenceKeysTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000107 /* PreferenceKeysTests.swift */; };
+		100000000000000000000108 /* AppUpdateServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000108 /* AppUpdateServiceTests.swift */; };
+		100000000000000000000201 /* Testing in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000001 /* Testing */; };
+		574626623018F58D00375A03 /* menucal.icon in Resources */ = {isa = PBXBuildFile; fileRef = 574626613018F58D00375A03 /* menucal.icon */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C00000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 800000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 500000000000000000000001;
+			remoteInfo = MenuCal;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		200000000000000000000001 /* MenuCalApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuCalApp.swift; sourceTree = "<group>"; };
+		200000000000000000000002 /* StatusItemController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItemController.swift; sourceTree = "<group>"; };
+		200000000000000000000003 /* CalendarAuthorization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarAuthorization.swift; sourceTree = "<group>"; };
+		200000000000000000000004 /* CalendarDay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarDay.swift; sourceTree = "<group>"; };
+		200000000000000000000005 /* CalendarEventSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventSummary.swift; sourceTree = "<group>"; };
+		200000000000000000000006 /* CalendarAutomationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarAutomationService.swift; sourceTree = "<group>"; };
+		200000000000000000000007 /* CalendarOpening.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarOpening.swift; sourceTree = "<group>"; };
+		200000000000000000000008 /* EventKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitService.swift; sourceTree = "<group>"; };
+		200000000000000000000009 /* EventProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventProviding.swift; sourceTree = "<group>"; };
+		20000000000000000000000A /* LoginItemManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemManaging.swift; sourceTree = "<group>"; };
+		20000000000000000000000B /* SMLoginItemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMLoginItemManager.swift; sourceTree = "<group>"; };
+		20000000000000000000000C /* CalendarStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarStore.swift; sourceTree = "<group>"; };
+		20000000000000000000000D /* LoginItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemViewModel.swift; sourceTree = "<group>"; };
+		20000000000000000000000E /* AppleScriptEscaper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleScriptEscaper.swift; sourceTree = "<group>"; };
+		20000000000000000000000F /* CalendarGridBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarGridBuilder.swift; sourceTree = "<group>"; };
+		200000000000000000000010 /* CalendarHighlightColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarHighlightColor.swift; sourceTree = "<group>"; };
+		200000000000000000000011 /* CalendarLayoutMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarLayoutMetrics.swift; sourceTree = "<group>"; };
+		200000000000000000000012 /* ClockFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClockFormatter.swift; sourceTree = "<group>"; };
+		200000000000000000000013 /* PreferenceKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferenceKeys.swift; sourceTree = "<group>"; };
+		200000000000000000000014 /* SystemSettingsOpener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemSettingsOpener.swift; sourceTree = "<group>"; };
+		200000000000000000000015 /* CalendarPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarPopoverView.swift; sourceTree = "<group>"; };
+		200000000000000000000016 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		200000000000000000000017 /* AppRelease.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRelease.swift; sourceTree = "<group>"; };
+		200000000000000000000018 /* AppUpdating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdating.swift; sourceTree = "<group>"; };
+		200000000000000000000019 /* AppUpdateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateService.swift; sourceTree = "<group>"; };
+		20000000000000000000001A /* AppUpdateViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateViewModel.swift; sourceTree = "<group>"; };
+		200000000000000000000101 /* AppleScriptEscaperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleScriptEscaperTests.swift; sourceTree = "<group>"; };
+		200000000000000000000102 /* CalendarAutomationServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarAutomationServiceTests.swift; sourceTree = "<group>"; };
+		200000000000000000000103 /* CalendarEventSummaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventSummaryTests.swift; sourceTree = "<group>"; };
+		200000000000000000000104 /* CalendarGridBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarGridBuilderTests.swift; sourceTree = "<group>"; };
+		200000000000000000000105 /* CalendarStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarStoreTests.swift; sourceTree = "<group>"; };
+		200000000000000000000106 /* ClockFormatterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClockFormatterTests.swift; sourceTree = "<group>"; };
+		200000000000000000000107 /* PreferenceKeysTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferenceKeysTests.swift; sourceTree = "<group>"; };
+		200000000000000000000108 /* AppUpdateServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateServiceTests.swift; sourceTree = "<group>"; };
+		200000000000000000000201 /* MenuCal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MenuCal.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		200000000000000000000202 /* MenuCalTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MenuCalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		200000000000000000000203 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		200000000000000000000204 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
+		200000000000000000000205 /* Package.resolved */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Package.resolved; sourceTree = "<group>"; };
+		200000000000000000000206 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		200000000000000000000207 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		200000000000000000000208 /* build_and_run.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build_and_run.sh; sourceTree = "<group>"; };
+		574626613018F58D00375A03 /* menucal.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = menucal.icon; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		400000000000000000000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		400000000000000000000005 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				100000000000000000000201 /* Testing in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		300000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				300000000000000000000002 /* Sources/MenuCal */,
+				300000000000000000000009 /* Tests */,
+				30000000000000000000000B /* Packaging */,
+				30000000000000000000000C /* script */,
+				200000000000000000000204 /* Package.swift */,
+				200000000000000000000205 /* Package.resolved */,
+				200000000000000000000206 /* README.md */,
+				200000000000000000000207 /* LICENSE */,
+				30000000000000000000000D /* Products */,
+				574626613018F58D00375A03 /* menucal.icon */,
+			);
+			sourceTree = "<group>";
+		};
+		300000000000000000000002 /* Sources/MenuCal */ = {
+			isa = PBXGroup;
+			children = (
+				300000000000000000000003 /* App */,
+				300000000000000000000004 /* Models */,
+				300000000000000000000005 /* Services */,
+				300000000000000000000006 /* Stores */,
+				300000000000000000000007 /* Support */,
+				300000000000000000000008 /* Views */,
+			);
+			path = Sources/MenuCal;
+			sourceTree = "<group>";
+		};
+		300000000000000000000003 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				200000000000000000000001 /* MenuCalApp.swift */,
+				200000000000000000000002 /* StatusItemController.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		300000000000000000000004 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				200000000000000000000017 /* AppRelease.swift */,
+				200000000000000000000003 /* CalendarAuthorization.swift */,
+				200000000000000000000004 /* CalendarDay.swift */,
+				200000000000000000000005 /* CalendarEventSummary.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		300000000000000000000005 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				200000000000000000000019 /* AppUpdateService.swift */,
+				200000000000000000000018 /* AppUpdating.swift */,
+				200000000000000000000006 /* CalendarAutomationService.swift */,
+				200000000000000000000007 /* CalendarOpening.swift */,
+				200000000000000000000008 /* EventKitService.swift */,
+				200000000000000000000009 /* EventProviding.swift */,
+				20000000000000000000000A /* LoginItemManaging.swift */,
+				20000000000000000000000B /* SMLoginItemManager.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		300000000000000000000006 /* Stores */ = {
+			isa = PBXGroup;
+			children = (
+				20000000000000000000001A /* AppUpdateViewModel.swift */,
+				20000000000000000000000C /* CalendarStore.swift */,
+				20000000000000000000000D /* LoginItemViewModel.swift */,
+			);
+			path = Stores;
+			sourceTree = "<group>";
+		};
+		300000000000000000000007 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				20000000000000000000000E /* AppleScriptEscaper.swift */,
+				20000000000000000000000F /* CalendarGridBuilder.swift */,
+				200000000000000000000010 /* CalendarHighlightColor.swift */,
+				200000000000000000000011 /* CalendarLayoutMetrics.swift */,
+				200000000000000000000012 /* ClockFormatter.swift */,
+				200000000000000000000013 /* PreferenceKeys.swift */,
+				200000000000000000000014 /* SystemSettingsOpener.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		300000000000000000000008 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				200000000000000000000015 /* CalendarPopoverView.swift */,
+				200000000000000000000016 /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		300000000000000000000009 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				30000000000000000000000A /* MenuCalTests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		30000000000000000000000A /* MenuCalTests */ = {
+			isa = PBXGroup;
+			children = (
+				200000000000000000000108 /* AppUpdateServiceTests.swift */,
+				200000000000000000000101 /* AppleScriptEscaperTests.swift */,
+				200000000000000000000102 /* CalendarAutomationServiceTests.swift */,
+				200000000000000000000103 /* CalendarEventSummaryTests.swift */,
+				200000000000000000000104 /* CalendarGridBuilderTests.swift */,
+				200000000000000000000105 /* CalendarStoreTests.swift */,
+				200000000000000000000106 /* ClockFormatterTests.swift */,
+				200000000000000000000107 /* PreferenceKeysTests.swift */,
+			);
+			path = MenuCalTests;
+			sourceTree = "<group>";
+		};
+		30000000000000000000000B /* Packaging */ = {
+			isa = PBXGroup;
+			children = (
+				200000000000000000000203 /* Info.plist */,
+			);
+			path = Packaging;
+			sourceTree = "<group>";
+		};
+		30000000000000000000000C /* script */ = {
+			isa = PBXGroup;
+			children = (
+				200000000000000000000208 /* build_and_run.sh */,
+			);
+			path = script;
+			sourceTree = "<group>";
+		};
+		30000000000000000000000D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				200000000000000000000201 /* MenuCal.app */,
+				200000000000000000000202 /* MenuCalTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		500000000000000000000001 /* MenuCal */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 700000000000000000000002 /* Build configuration list for PBXNativeTarget "MenuCal" */;
+			buildPhases = (
+				400000000000000000000001 /* Sources */,
+				400000000000000000000002 /* Frameworks */,
+				400000000000000000000003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MenuCal;
+			packageProductDependencies = (
+			);
+			productName = MenuCal;
+			productReference = 200000000000000000000201 /* MenuCal.app */;
+			productType = "com.apple.product-type.application";
+		};
+		500000000000000000000002 /* MenuCalTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 700000000000000000000003 /* Build configuration list for PBXNativeTarget "MenuCalTests" */;
+			buildPhases = (
+				400000000000000000000004 /* Sources */,
+				400000000000000000000005 /* Frameworks */,
+				400000000000000000000006 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B00000000000000000000001 /* PBXTargetDependency */,
+			);
+			name = MenuCalTests;
+			packageProductDependencies = (
+				A00000000000000000000001 /* Testing */,
+			);
+			productName = MenuCalTests;
+			productReference = 200000000000000000000202 /* MenuCalTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		800000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2660;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					500000000000000000000001 = {
+						CreatedOnToolsVersion = 26.0;
+					};
+					500000000000000000000002 = {
+						CreatedOnToolsVersion = 26.0;
+						TestTargetID = 500000000000000000000001;
+					};
+				};
+			};
+			buildConfigurationList = 700000000000000000000001 /* Build configuration list for PBXProject "MenuCal" */;
+			compatibilityVersion = "Xcode 15.0";
+			developmentRegion = zh_CN;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+				zh_CN,
+			);
+			mainGroup = 300000000000000000000001;
+			packageReferences = (
+				900000000000000000000001 /* XCRemoteSwiftPackageReference "swift-testing" */,
+			);
+			productRefGroup = 30000000000000000000000D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				500000000000000000000001 /* MenuCal */,
+				500000000000000000000002 /* MenuCalTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		400000000000000000000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				574626623018F58D00375A03 /* menucal.icon in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		400000000000000000000006 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		400000000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				100000000000000000000001 /* MenuCalApp.swift in Sources */,
+				100000000000000000000002 /* StatusItemController.swift in Sources */,
+				100000000000000000000003 /* CalendarAuthorization.swift in Sources */,
+				100000000000000000000004 /* CalendarDay.swift in Sources */,
+				100000000000000000000005 /* CalendarEventSummary.swift in Sources */,
+				100000000000000000000006 /* CalendarAutomationService.swift in Sources */,
+				100000000000000000000007 /* CalendarOpening.swift in Sources */,
+				100000000000000000000008 /* EventKitService.swift in Sources */,
+				100000000000000000000009 /* EventProviding.swift in Sources */,
+				10000000000000000000000A /* LoginItemManaging.swift in Sources */,
+				10000000000000000000000B /* SMLoginItemManager.swift in Sources */,
+				10000000000000000000000C /* CalendarStore.swift in Sources */,
+				10000000000000000000000D /* LoginItemViewModel.swift in Sources */,
+				10000000000000000000000E /* AppleScriptEscaper.swift in Sources */,
+				10000000000000000000000F /* CalendarGridBuilder.swift in Sources */,
+				100000000000000000000010 /* CalendarHighlightColor.swift in Sources */,
+				100000000000000000000011 /* CalendarLayoutMetrics.swift in Sources */,
+				100000000000000000000012 /* ClockFormatter.swift in Sources */,
+				100000000000000000000013 /* PreferenceKeys.swift in Sources */,
+				100000000000000000000014 /* SystemSettingsOpener.swift in Sources */,
+				100000000000000000000015 /* CalendarPopoverView.swift in Sources */,
+				100000000000000000000016 /* SettingsView.swift in Sources */,
+				100000000000000000000017 /* AppRelease.swift in Sources */,
+				100000000000000000000018 /* AppUpdating.swift in Sources */,
+				100000000000000000000019 /* AppUpdateService.swift in Sources */,
+				10000000000000000000001A /* AppUpdateViewModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		400000000000000000000004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				100000000000000000000101 /* AppleScriptEscaperTests.swift in Sources */,
+				100000000000000000000102 /* CalendarAutomationServiceTests.swift in Sources */,
+				100000000000000000000103 /* CalendarEventSummaryTests.swift in Sources */,
+				100000000000000000000104 /* CalendarGridBuilderTests.swift in Sources */,
+				100000000000000000000105 /* CalendarStoreTests.swift in Sources */,
+				100000000000000000000106 /* ClockFormatterTests.swift in Sources */,
+				100000000000000000000107 /* PreferenceKeysTests.swift in Sources */,
+				100000000000000000000108 /* AppUpdateServiceTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B00000000000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 500000000000000000000001 /* MenuCal */;
+			targetProxy = C00000000000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		600000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		600000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		600000000000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				ASSETCATALOG_COMPILER_APPICON_NAME = menucal;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Packaging/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.elliana.MenuCal;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		600000000000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				ASSETCATALOG_COMPILER_APPICON_NAME = menucal;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Packaging/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.elliana.MenuCal;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		600000000000000000000005 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(BUILT_PRODUCTS_DIR)/MenuCal.app/Contents/MacOS";
+				OTHER_LDFLAGS = "$(BUILT_PRODUCTS_DIR)/MenuCal.app/Contents/MacOS/MenuCal.debug.dylib";
+				PRODUCT_BUNDLE_IDENTIFIER = com.elliana.MenuCalTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		600000000000000000000006 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.elliana.MenuCalTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MenuCal.app/Contents/MacOS/MenuCal";
+				TEST_TARGET_NAME = MenuCal;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		700000000000000000000001 /* Build configuration list for PBXProject "MenuCal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				600000000000000000000001 /* Debug */,
+				600000000000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		700000000000000000000002 /* Build configuration list for PBXNativeTarget "MenuCal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				600000000000000000000003 /* Debug */,
+				600000000000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		700000000000000000000003 /* Build configuration list for PBXNativeTarget "MenuCalTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				600000000000000000000005 /* Debug */,
+				600000000000000000000006 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		900000000000000000000001 /* XCRemoteSwiftPackageReference "swift-testing" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/swiftlang/swift-testing.git";
+			requirement = {
+				kind = exactVersion;
+				version = 0.12.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A00000000000000000000001 /* Testing */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 900000000000000000000001 /* XCRemoteSwiftPackageReference "swift-testing" */;
+			productName = Testing;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 800000000000000000000001 /* Project object */;
+}

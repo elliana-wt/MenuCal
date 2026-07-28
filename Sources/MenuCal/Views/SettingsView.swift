@@ -1,84 +1,234 @@
+import Foundation
 import SwiftUI
 
 @MainActor
 struct SettingsView: View {
     @AppStorage(PreferenceKeys.clockFormat) private var clockFormat = PreferenceKeys.defaultClockFormat
-    @AppStorage(PreferenceKeys.clockFontSize) private var clockFontSize = PreferenceKeys.defaultClockFontSize
+    @AppStorage(PreferenceKeys.clockFontSizePixels)
+    private var clockFontSizePixels = PreferenceKeys.defaultClockFontSizePixels
+    @AppStorage(PreferenceKeys.clockVerticalOffsetPixels)
+    private var clockVerticalOffsetPixels = PreferenceKeys.defaultClockVerticalOffsetPixels
+    @AppStorage(PreferenceKeys.clockLeftPaddingPixels)
+    private var clockLeftPaddingPixels = PreferenceKeys.defaultClockHorizontalPaddingPixels
+    @AppStorage(PreferenceKeys.clockRightPaddingPixels)
+    private var clockRightPaddingPixels = PreferenceKeys.defaultClockHorizontalPaddingPixels
+    @AppStorage(PreferenceKeys.calendarDayFontSizePixels)
+    private var calendarDayFontSizePixels = PreferenceKeys.defaultCalendarDayFontSizePixels
+    @AppStorage(PreferenceKeys.calendarDayVerticalSpacingPixels)
+    private var calendarDayVerticalSpacingPixels =
+        PreferenceKeys.defaultCalendarDayVerticalSpacingPixels
+    @AppStorage(PreferenceKeys.calendarDayHorizontalSpacingPixels)
+    private var calendarDayHorizontalSpacingPixels =
+        PreferenceKeys.defaultCalendarDayHorizontalSpacingPixels
+    @AppStorage(PreferenceKeys.calendarHighlightColor)
+    private var calendarHighlightColor = PreferenceKeys.defaultCalendarHighlightColor
+    @AppStorage(PreferenceKeys.calendarShowsEvents)
+    private var calendarShowsEvents = PreferenceKeys.defaultCalendarShowsEvents
     @StateObject private var loginItemViewModel: LoginItemViewModel
+    @StateObject private var appUpdateViewModel: AppUpdateViewModel
 
-    init(loginItemManager: any LoginItemManaging) {
+    // MARK: - 排版常量（新增）
+    /// 每行标题文字的统一宽度，保证所有滑块从同一条竖线开始
+    private let controlLabelWidth: CGFloat = 76
+    /// 每行数值文字的统一宽度，兼容最长的 "下 999 px" 这类文本
+    private let controlValueWidth: CGFloat = 46
+
+    init(
+        loginItemManager: any LoginItemManaging,
+        appUpdater: any AppUpdating = AppUpdateService()
+    ) {
         _loginItemViewModel = StateObject(
             wrappedValue: LoginItemViewModel(manager: loginItemManager)
+        )
+        _appUpdateViewModel = StateObject(
+            wrappedValue: AppUpdateViewModel(updater: appUpdater)
         )
     }
 
     var body: some View {
-        Form {
-            Section("菜单栏时钟") {
-                TextField("格式模板", text: $clockFormat)
-                    .textFieldStyle(.roundedBorder)
 
-                Text("使用 DateFormatter 格式，例如 HH:mm:ss、M月d日 E HH:mm。")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-
-                HStack {
-                    Text("字号")
-                    Slider(
-                        value: $clockFontSize,
-                        in: PreferenceKeys.minimumClockFontSize...PreferenceKeys.maximumClockFontSize,
-                        step: 1
+        VStack(spacing: 0) {
+            Form {
+                Section("通用") {
+                    Toggle(
+                        "登录时启动",
+                        isOn: Binding(
+                            get: { loginItemViewModel.isEnabled },
+                            set: { loginItemViewModel.setEnabled($0) }
+                        )
                     )
-                    Text("\(Int(clockFontSize)) pt")
-                        .monospacedDigit()
-                        .frame(width: 42, alignment: .trailing)
-                }
 
-                TimelineView(.periodic(from: .now, by: 1)) { context in
-                    HStack {
-                        Text("预览")
-                        Spacer()
-                        Text(ClockFormatter().string(from: context.date, format: clockFormat))
-                            .font(.system(size: clockFontSize, weight: .regular, design: .monospaced))
-                            .lineLimit(1)
-                    }
-                    .padding(10)
-                    .background(.quaternary.opacity(0.55), in: RoundedRectangle(cornerRadius: 8))
-                }
-            }
-
-            Section("通用") {
-                Toggle(
-                    "登录时启动",
-                    isOn: Binding(
-                        get: { loginItemViewModel.isEnabled },
-                        set: { loginItemViewModel.setEnabled($0) }
-                    )
-                )
-
-                if loginItemViewModel.status == .requiresApproval {
-                    HStack {
-                        Text("需要在系统设置中批准 MenuCal。")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Button("打开登录项设置") {
-                            SystemSettingsOpener.openLoginItems()
+                    if loginItemViewModel.status == .requiresApproval {
+                        HStack {
+                            Text("需要在系统设置中批准 MenuCal。")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                            Button("打开登录项设置") {
+                                SystemSettingsOpener.openLoginItems()
+                            }
                         }
                     }
-                }
-            }
 
-            HStack {
-                Spacer()
-                Button("恢复默认设置") {
-                    clockFormat = PreferenceKeys.defaultClockFormat
-                    clockFontSize = PreferenceKeys.defaultClockFontSize
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("软件更新")
+                            Text("当前版本 v\(appUpdateViewModel.currentVersion)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        Spacer()
+
+                        Button {
+                            appUpdateViewModel.checkAndInstallUpdate()
+                        } label: {
+                            HStack(spacing: 6) {
+                                if appUpdateViewModel.isBusy {
+                                    ProgressView()
+                                        .controlSize(.small)
+                                }
+                                Text(appUpdateViewModel.buttonTitle)
+                            }
+                        }
+                        .disabled(appUpdateViewModel.isBusy)
+                    }
+                }
+                Section("菜单栏时钟") {
+
+                    HStack(alignment: .center) {
+                        Text("格式模板")
+                            .frame(width: controlLabelWidth, alignment: .leading)
+
+                        VStack(alignment: .trailing, spacing: 10) {
+                            TextField("格式模板", text: $clockFormat)
+                                .textFieldStyle(.roundedBorder)
+                                .labelsHidden()
+                                .frame(width: 233)
+                                .multilineTextAlignment(.trailing)
+
+                            Text("使用 DateFormatter 格式，如 HH:mm:ss、M月d日 E HH:mm")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.trailing)
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                        .padding(.top, 5)
+                    }
+
+                    HStack {
+                        Text("字号")
+                            .frame(width: controlLabelWidth, alignment: .leading)
+                        pixelSlider(
+                            value: $clockFontSizePixels,
+                            in: PreferenceKeys.minimumClockFontSizePixels...PreferenceKeys.maximumClockFontSizePixels
+                        )
+                        Text("\(Int(clockFontSizePixels)) px")
+                            .monospacedDigit()
+                            .frame(width: controlValueWidth, alignment: .trailing)
+                    }
+
+                    HStack {
+                        Text("上下位置")
+                            .frame(width: controlLabelWidth, alignment: .leading)
+                        pixelSlider(
+                            value: $clockVerticalOffsetPixels,
+                            in: PreferenceKeys.minimumClockVerticalOffsetPixels...PreferenceKeys.maximumClockVerticalOffsetPixels
+                        )
+                        Text(verticalOffsetDescription)
+                            .monospacedDigit()
+                            .frame(width: controlValueWidth, alignment: .trailing)
+                    }
+
+                    pixelSpacingControl(
+                        title: "左间距",
+                        value: $clockLeftPaddingPixels,
+                        in: clockHorizontalPaddingBounds
+                    )
+
+                    pixelSpacingControl(
+                        title: "右间距",
+                        value: $clockRightPaddingPixels,
+                        in: clockHorizontalPaddingBounds
+                    )
+                }
+
+                Section {
+                    Toggle("显示日程", isOn: $calendarShowsEvents)
+
+                    pixelSpacingControl(
+                        title: "日期字号",
+                        value: $calendarDayFontSizePixels,
+                        in: calendarDayFontSizeBounds
+                    )
+
+                    pixelSpacingControl(
+                        title: "上下间距",
+                        value: $calendarDayVerticalSpacingPixels,
+                        in: calendarDayVerticalSpacingBounds
+                    )
+
+                    pixelSpacingControl(
+                        title: "左右间距",
+                        value: $calendarDayHorizontalSpacingPixels,
+                        in: calendarDayHorizontalSpacingBounds
+                    )
+
+                    HStack {
+                        Text("高亮色")
+                            .frame(width: controlLabelWidth, alignment: .leading)
+                        Spacer()
+                        ColorPicker(
+                            "高亮色",
+                            selection: calendarHighlightColorBinding,
+                            supportsOpacity: false
+                        )
+                        .labelsHidden()
+
+                        Button("跟随系统") {
+                            calendarHighlightColor = PreferenceKeys.defaultCalendarHighlightColor
+                        }
+                        .disabled(
+                            calendarHighlightColor == PreferenceKeys.defaultCalendarHighlightColor
+                        )
+                    }
+                } header: {
+                    Text("弹窗日历")
+                } footer: {
+                    HStack {
+                        Spacer()
+                        Button("恢复默认设置") {
+                            clockFormat = PreferenceKeys.defaultClockFormat
+                            clockFontSizePixels = PreferenceKeys.defaultClockFontSizePixels
+                            clockVerticalOffsetPixels = PreferenceKeys.defaultClockVerticalOffsetPixels
+                            clockLeftPaddingPixels = PreferenceKeys.defaultClockHorizontalPaddingPixels
+                            clockRightPaddingPixels = PreferenceKeys.defaultClockHorizontalPaddingPixels
+                            calendarDayFontSizePixels = PreferenceKeys.defaultCalendarDayFontSizePixels
+                            calendarDayVerticalSpacingPixels =
+                                PreferenceKeys.defaultCalendarDayVerticalSpacingPixels
+                            calendarDayHorizontalSpacingPixels =
+                                PreferenceKeys.defaultCalendarDayHorizontalSpacingPixels
+                            calendarHighlightColor = PreferenceKeys.defaultCalendarHighlightColor
+                            calendarShowsEvents = PreferenceKeys.defaultCalendarShowsEvents
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 8)
+                    .padding(.horizontal, -10)
                 }
             }
+            .formStyle(.grouped)
+            .scrollDisabled(true)
+            .frame(maxHeight: .infinity)
+
+            Text("© 2026 未达之境 · Enfinity @Elliana. All rights reserved.")
+                .font(.system(size: 10))
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 14)
         }
-        .formStyle(.grouped)
-        .frame(width: 460, height: 330)
+        .frame(width: 520, height: 760)
         .onAppear {
             loginItemViewModel.refresh()
         }
@@ -93,5 +243,100 @@ struct SettingsView: View {
         } message: {
             Text(loginItemViewModel.errorMessage ?? "")
         }
+        .alert(item: $appUpdateViewModel.notice) { notice in
+            Alert(
+                title: Text(notice.title),
+                message: Text(notice.message),
+                dismissButton: .default(Text("好"))
+            )
+        }
+    }
+
+    private var verticalOffsetDescription: String {
+        let pixels = Int(clockVerticalOffsetPixels)
+        if pixels > 0 {
+            return "+ \(pixels) px"
+        }
+        if pixels < 0 {
+            return "- \(-pixels) px"
+        }
+        return "0 px"
+    }
+
+    private var clockHorizontalPaddingBounds: ClosedRange<Double> {
+        PreferenceKeys.minimumClockHorizontalPaddingPixels ... PreferenceKeys.maximumClockHorizontalPaddingPixels
+    }
+
+    private var calendarDayFontSizeBounds: ClosedRange<Double> {
+        PreferenceKeys.minimumCalendarDayFontSizePixels ... PreferenceKeys.maximumCalendarDayFontSizePixels
+    }
+
+    private var calendarDayVerticalSpacingBounds: ClosedRange<Double> {
+        PreferenceKeys.minimumCalendarDayVerticalSpacingPixels ... PreferenceKeys.maximumCalendarDayVerticalSpacingPixels
+    }
+
+    private var calendarDayHorizontalSpacingBounds: ClosedRange<Double> {
+        PreferenceKeys.minimumCalendarDayHorizontalSpacingPixels ... PreferenceKeys.maximumCalendarDayHorizontalSpacingPixels
+    }
+
+    private var calendarHighlightColorBinding: Binding<Color> {
+        Binding(
+            get: { CalendarHighlightColor.color(from: calendarHighlightColor) },
+            set: { calendarHighlightColor = CalendarHighlightColor.storageValue(from: $0) }
+        )
+    }
+
+    @ViewBuilder
+    private func pixelSlider(value: Binding<Double>, in bounds: ClosedRange<Double>) -> some View {
+        Slider(
+            value: integerPixelBinding(value),
+            in: bounds
+        )
+    }
+
+    private func integerPixelBinding(_ value: Binding<Double>) -> Binding<Double> {
+        Binding(
+            get: { value.wrappedValue },
+            set: { value.wrappedValue = $0.rounded() }
+        )
+    }
+
+    private func pixelSpacingControl(
+        title: String,
+        value: Binding<Double>,
+        in bounds: ClosedRange<Double>
+    ) -> some View {
+        HStack {
+            Text(title)
+                .frame(width: controlLabelWidth, alignment: .leading)
+            pixelSlider(
+                value: value,
+                in: bounds
+            )
+            Text("\(Int(value.wrappedValue)) px")
+                .monospacedDigit()
+                .frame(width: controlValueWidth, alignment: .trailing)
+        }
     }
 }
+
+#if DEBUG
+@MainActor
+private struct PreviewLoginItemManager: LoginItemManaging {
+    let status: LoginItemStatus
+
+    func setEnabled(_ enabled: Bool) throws {}
+}
+
+private struct SettingsView_Previews: PreviewProvider {
+    static var previews: some View {
+        SettingsView(
+            loginItemManager: PreviewLoginItemManager(status: .notRegistered)
+        )
+        .defaultAppStorage(
+            UserDefaults(suiteName: "com.elliana.MenuCal.preview.settings")!
+        )
+        .previewDisplayName("设置")
+    }
+}
+#endif
