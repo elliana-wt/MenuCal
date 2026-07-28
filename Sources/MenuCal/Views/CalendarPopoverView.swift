@@ -7,6 +7,9 @@ struct CalendarPopoverView: View {
     @State private var selectedDate: Date
     @State private var displayedMonth: Date
     @State private var automationError: String?
+    @AppStorage(PreferenceKeys.calendarDayHorizontalSpacingPixels)
+    private var dayHorizontalSpacingPixels =
+        PreferenceKeys.defaultCalendarDayHorizontalSpacingPixels
 
     private let calendar = Calendar.autoupdatingCurrent
     private let calendarOpener: any CalendarOpening
@@ -37,8 +40,6 @@ struct CalendarPopoverView: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 10)
 
-            Divider()
-
             EventListView(
                 selectedDate: selectedDate,
                 store: store,
@@ -46,11 +47,12 @@ struct CalendarPopoverView: View {
             )
 
             Divider()
+                .padding(.horizontal, 18)
 
             footer
         }
-        .frame(width: 360, height: 560)
-        .background(.regularMaterial)
+        .frame(width: popoverWidth, height: CalendarLayoutMetrics.popoverHeight)
+        .calendarPopoverSurface()
         .task {
             store.refresh(for: selectedDate, calendar: calendar)
         }
@@ -91,8 +93,15 @@ struct CalendarPopoverView: View {
         }
         .font(.system(size: 12))
         .foregroundStyle(.secondary)
+        .controlSize(.small)
         .padding(.horizontal, 18)
         .frame(height: 42)
+    }
+
+    private var popoverWidth: CGFloat {
+        CalendarLayoutMetrics.popoverWidth(
+            horizontalSpacingPixels: dayHorizontalSpacingPixels
+        )
     }
 
     private func moveMonth(by offset: Int) {
@@ -153,7 +162,7 @@ private struct CalendarHeaderView: View {
             }
             .help("下个月")
         }
-        .buttonStyle(.borderless)
+        .buttonStyle(.plain)
         .font(.system(size: 14, weight: .semibold))
         .padding(.horizontal, 18)
         .frame(height: 56)
@@ -165,6 +174,16 @@ private struct MonthGridView: View {
     let selectedDate: Date
     let calendar: Calendar
     let onSelect: (Date) -> Void
+    @AppStorage(PreferenceKeys.calendarDayFontSizePixels)
+    private var dayFontSizePixels = PreferenceKeys.defaultCalendarDayFontSizePixels
+    @AppStorage(PreferenceKeys.calendarDayVerticalSpacingPixels)
+    private var dayVerticalSpacingPixels =
+        PreferenceKeys.defaultCalendarDayVerticalSpacingPixels
+    @AppStorage(PreferenceKeys.calendarDayHorizontalSpacingPixels)
+    private var dayHorizontalSpacingPixels =
+        PreferenceKeys.defaultCalendarDayHorizontalSpacingPixels
+    @AppStorage(PreferenceKeys.calendarHighlightColor)
+    private var highlightColorStorageValue = PreferenceKeys.defaultCalendarHighlightColor
 
     private var builder: CalendarGridBuilder {
         CalendarGridBuilder(calendar: calendar)
@@ -172,16 +191,20 @@ private struct MonthGridView: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            LazyVGrid(columns: columns, spacing: 0) {
+            LazyVGrid(columns: columns, alignment: .center, spacing: 0) {
                 ForEach(Array(builder.weekdaySymbols().enumerated()), id: \.offset) { _, symbol in
                     Text(symbol)
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, minHeight: 22)
+                        .frame(width: dayCellSize, height: 22)
                 }
             }
 
-            LazyVGrid(columns: columns, spacing: 2) {
+            LazyVGrid(
+                columns: columns,
+                alignment: .center,
+                spacing: dayVerticalSpacing
+            ) {
                 ForEach(builder.days(containing: displayedMonth)) { day in
                     dayButton(day)
                 }
@@ -190,8 +213,54 @@ private struct MonthGridView: View {
     }
 
     private var columns: [GridItem] {
-        Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
+        Array(
+            repeating: GridItem(.fixed(dayCellSize), spacing: dayHorizontalSpacing),
+            count: 7
+        )
     }
+
+    private var dayFontSize: CGFloat {
+        PreferenceKeys.points(
+            fromPixels: min(
+                PreferenceKeys.maximumCalendarDayFontSizePixels,
+                max(PreferenceKeys.minimumCalendarDayFontSizePixels, dayFontSizePixels)
+            )
+        )
+    }
+
+    private var dayVerticalSpacing: CGFloat {
+        PreferenceKeys.points(
+            fromPixels: min(
+                PreferenceKeys.maximumCalendarDayVerticalSpacingPixels,
+                max(
+                    PreferenceKeys.minimumCalendarDayVerticalSpacingPixels,
+                    dayVerticalSpacingPixels
+                )
+            )
+        )
+    }
+
+    private var dayHorizontalSpacing: CGFloat {
+        PreferenceKeys.points(
+            fromPixels: min(
+                PreferenceKeys.maximumCalendarDayHorizontalSpacingPixels,
+                max(
+                    PreferenceKeys.minimumCalendarDayHorizontalSpacingPixels,
+                    dayHorizontalSpacingPixels
+                )
+            )
+        )
+    }
+
+    private var highlightColor: Color {
+        CalendarHighlightColor.color(from: highlightColorStorageValue)
+    }
+
+    private var highlightForegroundColor: Color {
+        CalendarHighlightColor.foregroundColor(from: highlightColorStorageValue)
+    }
+
+    private let dayCellSize: CGFloat = 32
 
     private func dayButton(_ day: CalendarDay) -> some View {
         let isSelected = calendar.isDate(day.date, inSameDayAs: selectedDate)
@@ -200,9 +269,14 @@ private struct MonthGridView: View {
             onSelect(day.date)
         } label: {
             Text(String(calendar.component(.day, from: day.date)))
-                .font(.system(size: 14, weight: day.isToday || isSelected ? .semibold : .regular))
+                .font(
+                    .system(
+                        size: dayFontSize,
+                        weight: day.isToday || isSelected ? .semibold : .regular
+                    )
+                )
                 .foregroundStyle(foregroundStyle(for: day, isSelected: isSelected))
-                .frame(width: 32, height: 32)
+                .frame(width: dayCellSize, height: dayCellSize)
                 .background {
                     Circle()
                         .fill(backgroundStyle(for: day, isSelected: isSelected))
@@ -210,23 +284,22 @@ private struct MonthGridView: View {
                 .contentShape(Circle())
         }
         .buttonStyle(.plain)
-        .frame(maxWidth: .infinity, minHeight: 34)
         .help(day.date.formatted(date: .long, time: .omitted))
     }
 
     private func foregroundStyle(for day: CalendarDay, isSelected: Bool) -> Color {
         if isSelected || day.isToday {
-            return .white
+            return highlightForegroundColor
         }
         return day.isInDisplayedMonth ? .primary : .secondary.opacity(0.55)
     }
 
     private func backgroundStyle(for day: CalendarDay, isSelected: Bool) -> Color {
         if isSelected {
-            return .accentColor
+            return highlightColor
         }
         if day.isToday {
-            return .accentColor.opacity(0.72)
+            return highlightColor.opacity(0.72)
         }
         return .clear
     }
@@ -372,3 +445,128 @@ private extension CalendarColor {
         Color(red: red, green: green, blue: blue, opacity: alpha)
     }
 }
+
+private extension View {
+    @ViewBuilder
+    func calendarPopoverSurface() -> some View {
+        if #available(macOS 26.0, *) {
+            self
+        } else {
+            background(.regularMaterial)
+        }
+    }
+}
+
+#if DEBUG
+@MainActor
+private final class PreviewEventProvider: EventProviding {
+    let authorizationStatus: CalendarAuthorization
+    var onEventsChanged: (() -> Void)?
+
+    private let includesEvents: Bool
+
+    init(
+        authorizationStatus: CalendarAuthorization,
+        includesEvents: Bool = false
+    ) {
+        self.authorizationStatus = authorizationStatus
+        self.includesEvents = includesEvents
+    }
+
+    func requestAccess() async -> Bool {
+        authorizationStatus == .fullAccess
+    }
+
+    func events(on date: Date, calendar: Calendar) -> [CalendarEventSummary] {
+        guard includesEvents else {
+            return []
+        }
+
+        let startOfDay = calendar.startOfDay(for: date)
+        let nextDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) ?? date
+        let meetingStart =
+            calendar.date(bySettingHour: 10, minute: 30, second: 0, of: date) ?? date
+        let meetingEnd =
+            calendar.date(byAdding: .minute, value: 45, to: meetingStart) ?? meetingStart
+        let focusStart =
+            calendar.date(bySettingHour: 14, minute: 0, second: 0, of: date) ?? date
+        let focusEnd =
+            calendar.date(byAdding: .hour, value: 2, to: focusStart) ?? focusStart
+
+        return CalendarEventSummary.sortedForDisplay([
+            CalendarEventSummary(
+                id: "preview-all-day",
+                externalIdentifier: nil,
+                title: "产品发布日",
+                startDate: startOfDay,
+                endDate: nextDay,
+                isAllDay: true,
+                location: nil,
+                calendarColor: CalendarColor(
+                    red: 0.96,
+                    green: 0.45,
+                    blue: 0.24,
+                    alpha: 1
+                )
+            ),
+            CalendarEventSummary(
+                id: "preview-meeting",
+                externalIdentifier: nil,
+                title: "界面细节评审",
+                startDate: meetingStart,
+                endDate: meetingEnd,
+                isAllDay: false,
+                location: "会议室 A",
+                calendarColor: .accent
+            ),
+            CalendarEventSummary(
+                id: "preview-focus",
+                externalIdentifier: nil,
+                title: "专注设计时间",
+                startDate: focusStart,
+                endDate: focusEnd,
+                isAllDay: false,
+                location: nil,
+                calendarColor: CalendarColor(
+                    red: 0.55,
+                    green: 0.34,
+                    blue: 0.91,
+                    alpha: 1
+                )
+            ),
+        ])
+    }
+}
+
+@MainActor
+private struct PreviewCalendarOpener: CalendarOpening {
+    func open(_ event: CalendarEventSummary) throws {}
+}
+
+private struct CalendarPopoverView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            CalendarPopoverView(
+                provider: PreviewEventProvider(
+                    authorizationStatus: .fullAccess,
+                    includesEvents: true
+                ),
+                calendarOpener: PreviewCalendarOpener()
+            )
+            .defaultAppStorage(
+                UserDefaults(suiteName: "com.elliana.MenuCal.preview.calendar")!
+            )
+            .previewDisplayName("日历 · 有日程")
+
+            CalendarPopoverView(
+                provider: PreviewEventProvider(authorizationStatus: .notDetermined),
+                calendarOpener: PreviewCalendarOpener()
+            )
+            .defaultAppStorage(
+                UserDefaults(suiteName: "com.elliana.MenuCal.preview.calendar.permission")!
+            )
+            .previewDisplayName("日历 · 未授权")
+        }
+    }
+}
+#endif
