@@ -143,7 +143,7 @@ private struct CalendarHeaderView: View {
     var body: some View {
         HStack {
             Text(displayedMonth, format: .dateTime.year().month(.wide))
-                .font(.system(size: 22, weight: .semibold))
+                .font(.system(size: 18, weight: .semibold))
 
             Spacer()
 
@@ -153,7 +153,7 @@ private struct CalendarHeaderView: View {
             .help("上个月")
 
             Button(action: goToToday) {
-                Image(systemName: "circle.circle")
+                Image(systemName: "smallcircle.filled.circle")
             }
             .help("回到今天")
 
@@ -334,9 +334,11 @@ private struct EventListView: View {
 
     private var permissionPrompt: some View {
         ContentUnavailableView {
-            Label("显示系统日程", systemImage: "calendar.badge.clock")
+            Label("显示日程", systemImage: "calendar.badge.clock")
+                .font(.system(size: 20, weight: .semibold))
         } description: {
-            Text("允许 MenuCal 读取日历后，这里会显示所选日期的事件。")
+            Text("允许 MenuCal 读取系统日历后，\n 这里会显示所选日期的事件。")
+                .font(.system(size: 12))
         } actions: {
             Button("允许读取日历") {
                 Task {
@@ -351,8 +353,10 @@ private struct EventListView: View {
     private var deniedPrompt: some View {
         ContentUnavailableView {
             Label("无法读取日历", systemImage: "calendar.badge.exclamationmark")
+                .font(.system(size: 20, weight: .semibold))
         } description: {
-            Text("请在系统设置的“隐私与安全性”中允许 MenuCal 访问日历。")
+            Text("请在系统设置的“隐私与安全性”中 \n 允许 MenuCal 访问日历。")
+                .font(.system(size: 12))
         } actions: {
             Button("打开系统设置") {
                 SystemSettingsOpener.openCalendarPrivacy()
@@ -365,11 +369,13 @@ private struct EventListView: View {
         if store.isLoading {
             ProgressView()
         } else if store.events.isEmpty {
-            ContentUnavailableView(
-                "没有日程",
-                systemImage: "calendar",
-                description: Text("这一天暂时没有安排。")
-            )
+            ContentUnavailableView {
+                Label("没有日程", systemImage: "calendar")
+                    .font(.system(size: 20, weight: .semibold))
+            } description: {
+                Text("这一天暂时没有安排")
+                    .font(.system(size: 12))
+            }
         } else {
             ScrollView {
                 LazyVStack(spacing: 2) {
@@ -547,16 +553,13 @@ private struct CalendarPopoverView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             CalendarPopoverView(
-                provider: PreviewEventProvider(
-                    authorizationStatus: .fullAccess,
-                    includesEvents: true
-                ),
+                provider: PreviewEventProvider(authorizationStatus: .fullAccess),
                 calendarOpener: PreviewCalendarOpener()
             )
             .defaultAppStorage(
-                UserDefaults(suiteName: "com.elliana.MenuCal.preview.calendar")!
+                UserDefaults(suiteName: "com.elliana.MenuCal.preview.calendar.empty")!
             )
-            .previewDisplayName("日历 · 有日程")
+            .previewDisplayName("日历 · 没有日程")
 
             CalendarPopoverView(
                 provider: PreviewEventProvider(authorizationStatus: .notDetermined),
