@@ -10,6 +10,7 @@ enum PreferenceKeys {
     static let calendarDayVerticalSpacingPixels = "calendarDayVerticalSpacingPixels"
     static let calendarDayHorizontalSpacingPixels = "calendarDayHorizontalSpacingPixels"
     static let calendarHighlightColor = "calendarHighlightColor"
+    static let calendarShowsEvents = "calendarShowsEvents"
 
     static let defaultClockFormat = "M月d日 E HH:mm"
     static let defaultClockFontSizePixels = 17.0
@@ -19,7 +20,7 @@ enum PreferenceKeys {
     static let minimumClockVerticalOffsetPixels = -6.0
     static let maximumClockVerticalOffsetPixels = 6.0
     static let defaultClockHorizontalPaddingPixels = 0.0
-    static let minimumClockHorizontalPaddingPixels = 0.0
+    static let minimumClockHorizontalPaddingPixels = -8.0
     static let maximumClockHorizontalPaddingPixels = 16.0
     static let defaultCalendarDayFontSizePixels = 19.0
     static let minimumCalendarDayFontSizePixels = 12.0
@@ -31,6 +32,7 @@ enum PreferenceKeys {
     static let minimumCalendarDayHorizontalSpacingPixels = 0.0
     static let maximumCalendarDayHorizontalSpacingPixels = 22.0
     static let defaultCalendarHighlightColor = "systemAccent"
+    static let defaultCalendarShowsEvents = true
 
     private static let legacyClockFontSize = "clockFontSize"
     private static let pointsPerPixel = 0.75
@@ -50,7 +52,8 @@ enum PreferenceKeys {
             calendarDayFontSizePixels: defaultCalendarDayFontSizePixels,
             calendarDayVerticalSpacingPixels: defaultCalendarDayVerticalSpacingPixels,
             calendarDayHorizontalSpacingPixels: defaultCalendarDayHorizontalSpacingPixels,
-            calendarHighlightColor: defaultCalendarHighlightColor
+            calendarHighlightColor: defaultCalendarHighlightColor,
+            calendarShowsEvents: defaultCalendarShowsEvents
         ])
     }
 

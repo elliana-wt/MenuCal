@@ -114,9 +114,7 @@ final class StatusItemController: NSObject {
         )
         let title = ClockFormatter().string(from: Date(), format: rawFormat)
 
-        let attributedTitle = NSMutableAttributedString()
-        attributedTitle.append(spacer(widthInPixels: leftPaddingPixels))
-        attributedTitle.append(NSAttributedString(
+        let clockTitle = NSAttributedString(
             string: title,
             attributes: [
                 .font: NSFont.monospacedDigitSystemFont(
@@ -126,9 +124,27 @@ final class StatusItemController: NSObject {
                 .baselineOffset: PreferenceKeys.points(fromPixels: verticalOffsetPixels),
                 .foregroundColor: NSColor.labelColor
             ]
-        ))
-        attributedTitle.append(spacer(widthInPixels: rightPaddingPixels))
+        )
+
+        button.attributedTitle = clockTitle
+        statusItem.length = NSStatusItem.variableLength
+        let defaultLength = button.frame.width
+
+        let attributedTitle = NSMutableAttributedString()
+        attributedTitle.append(
+            spacer(widthInPixels: max(leftPaddingPixels - rightPaddingPixels, 0))
+        )
+        attributedTitle.append(clockTitle)
+        attributedTitle.append(
+            spacer(widthInPixels: max(rightPaddingPixels - leftPaddingPixels, 0))
+        )
         button.attributedTitle = attributedTitle
+        statusItem.length = max(
+            button.fittingSize.width,
+            defaultLength + PreferenceKeys.points(
+                fromPixels: leftPaddingPixels + rightPaddingPixels
+            )
+        )
     }
 
     @objc
@@ -141,11 +157,20 @@ final class StatusItemController: NSObject {
         let horizontalSpacingPixels = UserDefaults.standard.double(
             forKey: PreferenceKeys.calendarDayHorizontalSpacingPixels
         )
+        let verticalSpacingPixels = UserDefaults.standard.double(
+            forKey: PreferenceKeys.calendarDayVerticalSpacingPixels
+        )
+        let showsEvents = UserDefaults.standard.bool(
+            forKey: PreferenceKeys.calendarShowsEvents
+        )
         let contentSize = NSSize(
             width: CalendarLayoutMetrics.popoverWidth(
                 horizontalSpacingPixels: horizontalSpacingPixels
             ),
-            height: CalendarLayoutMetrics.popoverHeight
+            height: CalendarLayoutMetrics.popoverHeight(
+                verticalSpacingPixels: verticalSpacingPixels,
+                showsEvents: showsEvents
+            )
         )
         guard popover.contentSize != contentSize else {
             return

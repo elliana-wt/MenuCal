@@ -22,7 +22,10 @@ struct SettingsView: View {
         PreferenceKeys.defaultCalendarDayHorizontalSpacingPixels
     @AppStorage(PreferenceKeys.calendarHighlightColor)
     private var calendarHighlightColor = PreferenceKeys.defaultCalendarHighlightColor
+    @AppStorage(PreferenceKeys.calendarShowsEvents)
+    private var calendarShowsEvents = PreferenceKeys.defaultCalendarShowsEvents
     @StateObject private var loginItemViewModel: LoginItemViewModel
+    @StateObject private var appUpdateViewModel: AppUpdateViewModel
 
     // MARK: - 排版常量（新增）
     /// 每行标题文字的统一宽度，保证所有滑块从同一条竖线开始
@@ -30,9 +33,15 @@ struct SettingsView: View {
     /// 每行数值文字的统一宽度，兼容最长的 "下 999 px" 这类文本
     private let controlValueWidth: CGFloat = 46
 
-    init(loginItemManager: any LoginItemManaging) {
+    init(
+        loginItemManager: any LoginItemManaging,
+        appUpdater: any AppUpdating = AppUpdateService()
+    ) {
         _loginItemViewModel = StateObject(
             wrappedValue: LoginItemViewModel(manager: loginItemManager)
+        )
+        _appUpdateViewModel = StateObject(
+            wrappedValue: AppUpdateViewModel(updater: appUpdater)
         )
     }
 
@@ -59,6 +68,30 @@ struct SettingsView: View {
                                 SystemSettingsOpener.openLoginItems()
                             }
                         }
+                    }
+
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("软件更新")
+                            Text("当前版本 v\(appUpdateViewModel.currentVersion)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        Spacer()
+
+                        Button {
+                            appUpdateViewModel.checkAndInstallUpdate()
+                        } label: {
+                            HStack(spacing: 6) {
+                                if appUpdateViewModel.isBusy {
+                                    ProgressView()
+                                        .controlSize(.small)
+                                }
+                                Text(appUpdateViewModel.buttonTitle)
+                            }
+                        }
+                        .disabled(appUpdateViewModel.isBusy)
                     }
                 }
                 Section("菜单栏时钟") {
@@ -121,6 +154,8 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    Toggle("显示日程", isOn: $calendarShowsEvents)
+
                     pixelSpacingControl(
                         title: "日期字号",
                         value: $calendarDayFontSizePixels,
@@ -174,6 +209,7 @@ struct SettingsView: View {
                             calendarDayHorizontalSpacingPixels =
                                 PreferenceKeys.defaultCalendarDayHorizontalSpacingPixels
                             calendarHighlightColor = PreferenceKeys.defaultCalendarHighlightColor
+                            calendarShowsEvents = PreferenceKeys.defaultCalendarShowsEvents
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -182,11 +218,17 @@ struct SettingsView: View {
                 }
             }
             .formStyle(.grouped)
+            .scrollDisabled(true)
             .frame(maxHeight: .infinity)
+
+            Text("© 2026 未达之境 · Enfinity @Elliana. All rights reserved.")
+                .font(.system(size: 10))
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 14)
         }
-        // 原来是 480x590；加了固定宽度标签后横向更紧凑，先放宽一点，
-        // 具体数值建议在 Xcode 预览里边看边调
-        .frame(width: 520, height: 635)
+        .frame(width: 520, height: 760)
         .onAppear {
             loginItemViewModel.refresh()
         }
@@ -200,6 +242,13 @@ struct SettingsView: View {
             Button("好", role: .cancel) {}
         } message: {
             Text(loginItemViewModel.errorMessage ?? "")
+        }
+        .alert(item: $appUpdateViewModel.notice) { notice in
+            Alert(
+                title: Text(notice.title),
+                message: Text(notice.message),
+                dismissButton: .default(Text("好"))
+            )
         }
     }
 

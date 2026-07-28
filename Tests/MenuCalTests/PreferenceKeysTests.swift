@@ -9,6 +9,16 @@ struct PreferenceKeysTests {
     }
 
     @Test
+    func clockHorizontalPaddingCanReduceEachEdgeByEightPixels() {
+        #expect(PreferenceKeys.minimumClockHorizontalPaddingPixels == -8)
+        #expect(
+            PreferenceKeys.points(
+                fromPixels: PreferenceKeys.minimumClockHorizontalPaddingPixels
+            ) == -6
+        )
+    }
+
+    @Test
     func migratesLegacyPointFontSizeToPixels() {
         let suiteName = "PreferenceKeysTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
@@ -30,6 +40,7 @@ struct PreferenceKeysTests {
             defaults.string(forKey: PreferenceKeys.calendarHighlightColor)
                 == PreferenceKeys.defaultCalendarHighlightColor
         )
+        #expect(defaults.bool(forKey: PreferenceKeys.calendarShowsEvents))
     }
 
     @Test
@@ -41,6 +52,42 @@ struct PreferenceKeysTests {
         )
         #expect(CalendarLayoutMetrics.popoverWidth(horizontalSpacingPixels: 0) == 261)
         #expect(CalendarLayoutMetrics.popoverWidth(horizontalSpacingPixels: 100) == 360)
+    }
+
+    @Test
+    func calendarPopoverHeightTracksVerticalSpacingAndPreservesEventListHeight() {
+        #expect(CalendarLayoutMetrics.eventListHeight == 260)
+        #expect(CalendarLayoutMetrics.defaultPopoverHeight == 606)
+        #expect(
+            CalendarLayoutMetrics.popoverHeight(
+                verticalSpacingPixels: PreferenceKeys.defaultCalendarDayVerticalSpacingPixels,
+                showsEvents: true
+            ) == CalendarLayoutMetrics.defaultPopoverHeight
+        )
+        #expect(
+            CalendarLayoutMetrics.popoverHeight(
+                verticalSpacingPixels: PreferenceKeys.defaultCalendarDayVerticalSpacingPixels,
+                showsEvents: false
+            ) == 346
+        )
+        #expect(
+            CalendarLayoutMetrics.popoverHeight(
+                verticalSpacingPixels: 0,
+                showsEvents: true
+            ) == 587.25
+        )
+        #expect(
+            CalendarLayoutMetrics.popoverHeight(
+                verticalSpacingPixels: 20,
+                showsEvents: true
+            ) == 662.25
+        )
+        #expect(
+            CalendarLayoutMetrics.popoverHeight(
+                verticalSpacingPixels: 100,
+                showsEvents: true
+            ) == 662.25
+        )
     }
 
     @Test

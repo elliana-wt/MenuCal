@@ -10,6 +10,11 @@ struct CalendarPopoverView: View {
     @AppStorage(PreferenceKeys.calendarDayHorizontalSpacingPixels)
     private var dayHorizontalSpacingPixels =
         PreferenceKeys.defaultCalendarDayHorizontalSpacingPixels
+    @AppStorage(PreferenceKeys.calendarDayVerticalSpacingPixels)
+    private var dayVerticalSpacingPixels =
+        PreferenceKeys.defaultCalendarDayVerticalSpacingPixels
+    @AppStorage(PreferenceKeys.calendarShowsEvents)
+    private var showsEvents = PreferenceKeys.defaultCalendarShowsEvents
 
     private let calendar = Calendar.autoupdatingCurrent
     private let calendarOpener: any CalendarOpening
@@ -40,24 +45,32 @@ struct CalendarPopoverView: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 10)
 
-            EventListView(
-                selectedDate: selectedDate,
-                store: store,
-                onOpenEvent: openEvent
-            )
+            if showsEvents {
+                EventListView(
+                    selectedDate: selectedDate,
+                    store: store,
+                    onOpenEvent: openEvent
+                )
+                .frame(height: CalendarLayoutMetrics.eventListHeight)
+            }
 
             Divider()
                 .padding(.horizontal, 18)
 
             footer
         }
-        .frame(width: popoverWidth, height: CalendarLayoutMetrics.popoverHeight)
+        .frame(width: popoverWidth, height: popoverHeight)
         .calendarPopoverSurface()
         .task {
-            store.refresh(for: selectedDate, calendar: calendar)
+            refreshEventsIfShown()
         }
         .onChange(of: selectedDate) { _, newDate in
-            store.refresh(for: newDate, calendar: calendar)
+            refreshEventsIfShown(for: newDate)
+        }
+        .onChange(of: showsEvents) { _, isShown in
+            if isShown {
+                store.refresh(for: selectedDate, calendar: calendar)
+            }
         }
         .alert(
             "无法打开系统日历",
@@ -102,6 +115,20 @@ struct CalendarPopoverView: View {
         CalendarLayoutMetrics.popoverWidth(
             horizontalSpacingPixels: dayHorizontalSpacingPixels
         )
+    }
+
+    private var popoverHeight: CGFloat {
+        CalendarLayoutMetrics.popoverHeight(
+            verticalSpacingPixels: dayVerticalSpacingPixels,
+            showsEvents: showsEvents
+        )
+    }
+
+    private func refreshEventsIfShown(for date: Date? = nil) {
+        guard showsEvents else {
+            return
+        }
+        store.refresh(for: date ?? selectedDate, calendar: calendar)
     }
 
     private func moveMonth(by offset: Int) {
@@ -333,13 +360,11 @@ private struct EventListView: View {
     }
 
     private var permissionPrompt: some View {
-        ContentUnavailableView {
-            Label("显示日程", systemImage: "calendar.badge.clock")
-                .font(.system(size: 20, weight: .semibold))
-        } description: {
-            Text("允许 MenuCal 读取系统日历后，\n 这里会显示所选日期的事件。")
-                .font(.system(size: 12))
-        } actions: {
+        CalendarUnavailableView(
+            title: "显示日程",
+            systemImage: "calendar.badge.clock",
+            description: "允许 MenuCal 读取系统日历后，\n这里会显示所选日期的事件。"
+        ) {
             Button("允许读取日历") {
                 Task {
                     await store.requestAccess(for: selectedDate)
@@ -351,13 +376,11 @@ private struct EventListView: View {
     }
 
     private var deniedPrompt: some View {
-        ContentUnavailableView {
-            Label("无法读取日历", systemImage: "calendar.badge.exclamationmark")
-                .font(.system(size: 20, weight: .semibold))
-        } description: {
-            Text("请在系统设置的“隐私与安全性”中 \n 允许 MenuCal 访问日历。")
-                .font(.system(size: 12))
-        } actions: {
+        CalendarUnavailableView(
+            title: "无法读取日历",
+            systemImage: "calendar.badge.exclamationmark",
+            description: "请在系统设置的“隐私与安全性”中\n允许 MenuCal 访问日历。"
+        ) {
             Button("打开系统设置") {
                 SystemSettingsOpener.openCalendarPrivacy()
             }
@@ -369,12 +392,12 @@ private struct EventListView: View {
         if store.isLoading {
             ProgressView()
         } else if store.events.isEmpty {
-            ContentUnavailableView {
-                Label("没有日程", systemImage: "calendar")
-                    .font(.system(size: 20, weight: .semibold))
-            } description: {
-                Text("这一天暂时没有安排")
-                    .font(.system(size: 12))
+            CalendarUnavailableView(
+                title: "没有日程",
+                systemImage: "calendar",
+                description: "这一天暂时没有安排"
+            ) {
+                EmptyView()
             }
         } else {
             ScrollView {
@@ -389,6 +412,48 @@ private struct EventListView: View {
                 .padding(.bottom, 8)
             }
         }
+    }
+}
+
+private struct CalendarUnavailableView<Actions: View>: View {
+    let title: String
+    let systemImage: String
+    let description: String
+    private let actions: Actions
+
+    init(
+        title: String,
+        systemImage: String,
+        description: String,
+        @ViewBuilder actions: () -> Actions
+    ) {
+        self.title = title
+        self.systemImage = systemImage
+        self.description = description
+        self.actions = actions()
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Image(systemName: systemImage)
+                .font(.system(size: 28, weight: .regular))
+                .foregroundStyle(.secondary)
+                .frame(width: 32, height: 32)
+                .padding(.bottom, 10)
+
+            Text(title)
+                .font(.system(size: 20, weight: .semibold))
+
+            Text(description)
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.top, 8)
+
+            actions
+                .padding(.top, 14)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
