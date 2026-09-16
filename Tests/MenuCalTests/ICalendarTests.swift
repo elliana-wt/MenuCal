@@ -48,8 +48,10 @@ struct ICalendarTests {
         let doc = try event("DTSTART;VALUE=DATE:20240101\nRRULE:FREQ=YEARLY;COUNT=6")
         let occurrences = try events(doc, from: "20240101", to: "20310101")
         #expect(occurrences.count == 6)
-        #expect(occurrences.last?.summary.startDate == (try date("20290101")))
-        #expect(occurrences.first?.summary.endDate == (try date("20240102")))
+        let expectedLastStart = try date("20290101")
+        let expectedFirstEnd = try date("20240102")
+        #expect(occurrences.last?.summary.startDate == expectedLastStart)
+        #expect(occurrences.first?.summary.endDate == expectedFirstEnd)
     }
 
     @Test func unfoldsAndUnescapesWithoutReadingAlarmSummary() throws {
@@ -71,7 +73,8 @@ struct ICalendarTests {
         #expect(doc.title == "私人日历")
         #expect(summary.title == "项目,讨论和复盘\n第二行")
         #expect(summary.location == "会议室;A")
-        #expect(summary.startDate == (try date("20260916T090000")))
+        let expectedStart = try date("20260916T090000")
+        #expect(summary.startDate == expectedStart)
     }
 
     @Test func weeklyExclusionsAdditionsMovedAndCancelledInstances() throws {
@@ -107,7 +110,8 @@ struct ICalendarTests {
     @Test func monthlyLastWeekdayAndInvalidMonthDates() throws {
         let doc = try event("DTSTART:20260731T090000\nRRULE:FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-1;COUNT=4")
         let starts = try events(doc, from: "20260701", to: "20261101").map { $0.summary.startDate }
-        #expect(starts == (try ["20260731T090000", "20260831T090000", "20260930T090000", "20261030T090000"].map(date)))
+        let expectedStarts = try ["20260731T090000", "20260831T090000", "20260930T090000", "20261030T090000"].map(date)
+        #expect(starts == expectedStarts)
         let every31st = try event("DTSTART;VALUE=DATE:20260131\nRRULE:FREQ=MONTHLY;COUNT=3")
         #expect(try events(every31st, from: "20260101", to: "20260701").map { $0.summary.startDate } == ["20260131", "20260331", "20260531"].map(date))
     }
