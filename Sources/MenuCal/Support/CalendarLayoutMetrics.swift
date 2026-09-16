@@ -27,7 +27,8 @@ enum CalendarLayoutMetrics {
 
     static func popoverHeight(
         verticalSpacingPixels: Double,
-        showsEvents: Bool
+        showsEvents: Bool,
+        showsDayAnnotations: Bool = false
     ) -> CGFloat {
         let spacingPixels = verticalSpacingPixels.isFinite
             ? verticalSpacingPixels
@@ -43,6 +44,7 @@ enum CalendarLayoutMetrics {
         let eventHeight = showsEvents ? eventListHeight : 0
 
         return defaultCalendarAndChromeHeight
+            + (showsDayAnnotations ? 96 : 0)
             + eventHeight
             + calendarRowGapCount * (currentSpacing - defaultSpacing)
     }
