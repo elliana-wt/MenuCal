@@ -81,9 +81,11 @@ else
   swift build "${SWIFT_BUILD_OPTIONS[@]}" --product "$APP_NAME"
   SWIFT_BIN_DIR="$(swift build "${SWIFT_BUILD_OPTIONS[@]}" --show-bin-path)"
   rm -rf "$APP_BUNDLE"
-  mkdir -p "$APP_CONTENTS/MacOS"
+  mkdir -p "$APP_CONTENTS/MacOS" "$APP_CONTENTS/Resources"
   cp "$SWIFT_BIN_DIR/$APP_NAME" "$APP_BINARY"
   cp "$ROOT_DIR/Packaging/Info.plist" "$APP_CONTENTS/Info.plist"
+  # Precompiled from menucal.icon for builds without Xcode's asset compiler.
+  cp "$ROOT_DIR/Packaging/menucal.icns" "$APP_CONTENTS/Resources/menucal.icns"
 fi
 
 LINKED_SDK_VERSION="$(xcrun vtool -show-build "$APP_BINARY" | awk '$1 == "sdk" { print $2; exit }')"

@@ -30,9 +30,9 @@ final class CalendarSubscriptionStore: ObservableObject {
             .appendingPathComponent("MenuCal/CalendarSubscriptions.json")
         self.fetch = fetch
         if let data = try? Data(contentsOf: self.storageURL), let saved = try? JSONDecoder().decode(SavedState.self, from: data) {
+            // A saved list may intentionally omit the default holiday subscription.
             subscriptions = saved.subscriptions
             feeds = saved.feeds
-            if !subscriptions.contains(where: \.isBuiltIn) { subscriptions.insert(.chinaHolidays, at: 0) }
         } else {
             subscriptions = [.chinaHolidays]
             feeds = [:]
@@ -52,7 +52,7 @@ final class CalendarSubscriptionStore: ObservableObject {
     }
 
     func remove(id: UUID) {
-        guard subscriptions.contains(where: { $0.id == id && !$0.isBuiltIn }) else { return }
+        guard subscriptions.contains(where: { $0.id == id }) else { return }
         subscriptions.removeAll { $0.id == id }
         feeds[id] = nil
         documents[id] = nil

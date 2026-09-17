@@ -23,7 +23,6 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTo
             defer: false
         )
         window.title = navigation.selection.rawValue
-        window.subtitle = "MenuCal · 设置"
         window.titleVisibility = .visible
         window.toolbarStyle = .unified
         window.isReleasedWhenClosed = false
@@ -42,9 +41,9 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTo
         detailController.sizingOptions = []
 
         let sidebar = NSSplitViewItem(sidebarWithViewController: sidebarController)
-        sidebar.minimumThickness = 180
+        // Use the previous maximum width and prevent divider resizing.
+        sidebar.minimumThickness = 240
         sidebar.maximumThickness = 240
-        sidebar.preferredThicknessFraction = 0.24
         sidebar.allowsFullHeightLayout = true
         sidebar.canCollapseFromWindowResize = false
         sidebar.collapseBehavior = .preferResizingSiblingsWithFixedSplitView
@@ -95,7 +94,8 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTo
     }
 
     func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        [.toggleSidebar, Self.sidebarSeparator, .flexibleSpace]
+        // Keep the toggle at the trailing edge of the sidebar's toolbar region.
+        [.flexibleSpace, .toggleSidebar, Self.sidebarSeparator, .flexibleSpace]
     }
 
     func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {

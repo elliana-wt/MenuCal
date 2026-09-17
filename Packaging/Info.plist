@@ -12,12 +12,14 @@
     <string>6.0</string>
     <key>CFBundleName</key>
     <string>MenuCal</string>
+    <key>CFBundleIconFile</key>
+    <string>menucal</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.2.0</string>
+    <string>1.2.1</string>
     <key>CFBundleVersion</key>
-    <string>2026091701</string>
+    <string>2026091801</string>
     <key>LSArchitecturePriority</key>
     <array>
         <string>arm64</string>

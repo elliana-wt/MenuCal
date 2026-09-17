@@ -24,18 +24,18 @@ struct CalendarSubscriptionsSettingsView: View {
                                 } label: {
                                     Image(systemName: "arrow.clockwise")
                                 }
+                                .controlSize(.regular)
                                 .help("刷新\(subscription.title)")
                                 .accessibilityLabel("刷新\(subscription.title)")
                             }
-                            if !subscription.isBuiltIn {
-                                Button(role: .destructive) {
-                                    store.remove(id: subscription.id)
-                                } label: {
-                                    Image(systemName: "trash")
-                                }
-                                .help("删除\(subscription.title)")
-                                .accessibilityLabel("删除\(subscription.title)")
+                            Button(role: .destructive) {
+                                store.remove(id: subscription.id)
+                            } label: {
+                                Image(systemName: "trash")
                             }
+                            .controlSize(.regular)
+                            .help("删除\(subscription.title)")
+                            .accessibilityLabel("删除\(subscription.title)")
                         }
                         if let error = store.errors[subscription.id] {
                             Text(error + (store.lastUpdated(subscription.id) == nil ? "" : " 当前显示上次同步的内容。"))
@@ -58,16 +58,24 @@ struct CalendarSubscriptionsSettingsView: View {
                     .padding(.vertical, 3)
                 }
                 HStack {
-                    Button("添加订阅…", systemImage: "plus") { addingSubscription = true }
+                    Button { addingSubscription = true } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "plus")
+                            Text("添加订阅…")
+                        }
+                        .font(.system(size: 13))
+                    }
+                    .controlSize(.regular)
                     Spacer()
                     Button("全部刷新") { Task { await store.refreshAll(force: true) } }
+                        .controlSize(.regular)
                         .disabled(!store.refreshing.isEmpty)
                 }
                 if let error = store.persistenceError {
                     Text(error).font(.caption).foregroundStyle(.orange)
                 }
             } header: {
-                Text("已订阅的日历")
+                Text("已订阅的日历").bold()
             } footer: {
                 Text("订阅在 MenuCal 内管理，无需系统日历权限。使用时每 6 小时刷新，离线保留上次内容。节假日与调休以 Apple 已发布的数据为准。")
                     .font(.caption)
@@ -105,7 +113,9 @@ private struct AddCalendarSubscriptionView: View {
                 if isAdding { ProgressView().controlSize(.small); Text("正在验证日历…").font(.caption) }
                 Spacer()
                 Button("取消") { addTask?.cancel(); dismiss() }.keyboardShortcut(.cancelAction)
+                    .controlSize(.regular)
                 Button("订阅", action: add)
+                    .controlSize(.regular)
                     .keyboardShortcut(.defaultAction)
                     .disabled(isAdding || address.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }

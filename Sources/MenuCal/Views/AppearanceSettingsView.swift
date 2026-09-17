@@ -28,7 +28,7 @@ struct AppearanceSettingsView: View {
 
     var body: some View {
         Form {
-            Section("菜单栏时钟") {
+            Section {
                 HStack(alignment: .center) {
                     Text("格式模板")
                         .frame(width: controlLabelWidth, alignment: .leading)
@@ -86,9 +86,11 @@ struct AppearanceSettingsView: View {
                     value: $clockRightPaddingPixels,
                     in: clockHorizontalPaddingBounds
                 )
+            } header: {
+                Text("菜单栏时钟").bold()
             }
 
-            Section("弹窗日历") {
+            Section {
                 Toggle("显示日程", isOn: $calendarShowsEvents)
 
                 pixelSpacingControl(
@@ -123,20 +125,24 @@ struct AppearanceSettingsView: View {
                     Button("跟随系统") {
                         calendarHighlightColor = PreferenceKeys.defaultCalendarHighlightColor
                     }
+                    .controlSize(.regular)
                     .disabled(
                         calendarHighlightColor == PreferenceKeys.defaultCalendarHighlightColor
                     )
                 }
-            }
-            Section {
+            } header: {
+                Text("弹窗日历").bold()
+            } footer: {
                 HStack {
                     Spacer()
-                    Button("恢复外观默认值", action: restoreDefaults)
+                    Button(action: restoreDefaults) {
+                        Text("恢复外观默认值")
+                            .font(.system(size: 13))
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.regular)
                 }
-            } footer: {
-                Text("更改会即时应用。")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                .padding(.top, 4)
             }
         }
         .formStyle(.grouped)

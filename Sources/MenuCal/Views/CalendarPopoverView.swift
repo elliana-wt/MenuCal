@@ -6,7 +6,6 @@ struct CalendarPopoverView: View {
     @ObservedObject private var subscriptions = CalendarSubscriptionStore.shared
     @ViewState private var timeZoneRevision = 0
     @ViewState private var subscribedEvents: [SubscribedCalendarEvent] = []
-    @ViewState private var selectedSubscribedEvent: SubscribedCalendarEvent?
     @StateObject private var store: CalendarStore
     @ViewState private var selectedDate: Date
     @ViewState private var displayedMonth: Date
@@ -62,9 +61,6 @@ struct CalendarPopoverView: View {
                 EventListView(
                     selectedDate: selectedDate,
                     store: store,
-                    subscribedEvents: subscribedEvents.filter { $0.occurs(on: selectedDate, calendar: calendar) },
-                    hasPersonalSubscriptions: subscriptions.subscriptions.contains { !$0.isBuiltIn && $0.isEnabled },
-                    onOpenSubscription: { selectedSubscribedEvent = $0 },
                     onOpenEvent: openEvent
                 )
                 .frame(height: CalendarLayoutMetrics.eventListHeight)
@@ -86,9 +82,6 @@ struct CalendarPopoverView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .NSSystemTimeZoneDidChange)) { _ in
             timeZoneRevision += 1
-        }
-        .popover(item: $selectedSubscribedEvent) { event in
-            SubscribedEventDetailView(event: event)
         }
         .onChange(of: selectedDate) { _, newDate in
             refreshEventsIfShown(for: newDate)
@@ -353,7 +346,7 @@ private struct MonthGridView: View {
                 if showsHolidays {
                     Text(holiday?.holidayLabel ?? " ")
                         .font(.system(size: 8, weight: .medium))
-                        .foregroundStyle(holiday?.specialDay == "ALTERNATE-WORKDAY" ? Color.orange : Color.secondary)
+                        .foregroundStyle(holiday?.specialDay == "ALTERNATE-WORKDAY" ? Color.gray : Color.orange)
                         .lineLimit(1)
                         .minimumScaleFactor(0.75)
                         .frame(width: dayCellSize, height: 16)
@@ -388,9 +381,6 @@ private struct MonthGridView: View {
 private struct EventListView: View {
     let selectedDate: Date
     @ObservedObject var store: CalendarStore
-    let subscribedEvents: [SubscribedCalendarEvent]
-    let hasPersonalSubscriptions: Bool
-    let onOpenSubscription: (SubscribedCalendarEvent) -> Void
     let onOpenEvent: (CalendarEventSummary) -> Void
 
     var body: some View {
@@ -401,33 +391,18 @@ private struct EventListView: View {
                 .padding(.top, 12)
 
             Group {
-                if hasPersonalSubscriptions || !subscribedEvents.isEmpty {
+                switch store.authorization {
+                case .notDetermined:
+                    permissionPrompt
+                case .denied, .restricted:
+                    deniedPrompt
+                case .fullAccess:
                     eventContent
-                } else {
-                    switch store.authorization {
-                    case .notDetermined:
-                        permissionPrompt
-                    case .denied, .restricted:
-                        deniedPrompt
-                    case .fullAccess:
-                        eventContent
-                    }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-
-    private var combinedEvents: [CalendarEventSummary] {
-        let subscribed = subscribedEvents.map(\.summary)
-        let system = store.events.filter { event in
-            !subscribed.contains {
-                $0.startDate == event.startDate && $0.endDate == event.endDate &&
-                    ($0.externalIdentifier != nil && $0.externalIdentifier == event.externalIdentifier)
-            }
-        }
-        return CalendarEventSummary.sortedForDisplay(system + subscribed)
     }
 
     private var permissionPrompt: some View {
@@ -458,44 +433,23 @@ private struct EventListView: View {
         }
     }
 
-    private var systemCalendarButton: some View {
-        Button(store.authorization == .notDetermined ? "同时显示系统日历…" : "允许访问系统日历…") {
-            if store.authorization == .notDetermined {
-                Task { await store.requestAccess(for: selectedDate) }
-            } else { SystemSettingsOpener.openCalendarPrivacy() }
-        }
-    }
-
     @ViewBuilder
     private var eventContent: some View {
         if store.isLoading {
             ProgressView()
-        } else if combinedEvents.isEmpty {
+        } else if store.events.isEmpty {
             CalendarUnavailableView(
                 title: "没有日程",
                 systemImage: "calendar",
                 description: "这一天暂时没有安排"
-            ) {
-                if store.authorization != .fullAccess {
-                    systemCalendarButton
-                }
-            }
+            ) {}
         } else {
             ScrollView {
                 LazyVStack(spacing: 2) {
-                    ForEach(combinedEvents) { event in
-                        let subscription = subscribedEvents.first { $0.id == event.id }
-                        EventRow(event: event, isSubscription: subscription != nil) {
-                            if let subscription { onOpenSubscription(subscription) }
-                            else { onOpenEvent(event) }
+                    ForEach(store.events) { event in
+                        EventRow(event: event) {
+                            onOpenEvent(event)
                         }
-                    }
-                    if store.authorization != .fullAccess {
-                        systemCalendarButton
-                        .font(.caption)
-                        .buttonStyle(.plain)
-                        .foregroundStyle(.secondary)
-                        .padding(8)
                     }
                 }
                 .padding(.horizontal, 10)
@@ -549,7 +503,6 @@ private struct CalendarUnavailableView<Actions: View>: View {
 
 private struct EventRow: View {
     let event: CalendarEventSummary
-    var isSubscription = false
     let action: () -> Void
 
     var body: some View {
@@ -579,7 +532,7 @@ private struct EventRow: View {
 
                 Spacer(minLength: 0)
 
-                Image(systemName: isSubscription ? "info.circle" : "arrow.up.forward.app")
+                Image(systemName: "arrow.up.forward.app")
                     .font(.system(size: 11))
                     .foregroundStyle(.tertiary)
             }

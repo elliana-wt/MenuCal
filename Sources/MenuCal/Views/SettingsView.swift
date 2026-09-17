@@ -60,6 +60,7 @@ struct SettingsView: View {
         }
         .id(navigation.selection)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .font(.system(size: 13))
         .toggleStyle(.switch)
         .controlSize(.small)
         .alert(
