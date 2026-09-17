@@ -43,6 +43,17 @@
 		100000000000000000000108 /* AppUpdateServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000108 /* AppUpdateServiceTests.swift */; };
 		100000000000000000000201 /* Testing in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000001 /* Testing */; };
 		574626623018F58D00375A03 /* menucal.icon in Resources */ = {isa = PBXBuildFile; fileRef = 574626613018F58D00375A03 /* menucal.icon */; };
+		100000000000000000000301 /* CalendarSubscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000301 /* CalendarSubscription.swift */; };
+		100000000000000000000302 /* CalendarFeedClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000302 /* CalendarFeedClient.swift */; };
+		100000000000000000000303 /* ICalendarParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000303 /* ICalendarParser.swift */; };
+		100000000000000000000304 /* ICalendarRecurrence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000304 /* ICalendarRecurrence.swift */; };
+		100000000000000000000305 /* CalendarSubscriptionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000305 /* CalendarSubscriptionStore.swift */; };
+		100000000000000000000306 /* CalendarSubscriptionsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000306 /* CalendarSubscriptionsSettingsView.swift */; };
+		100000000000000000000307 /* SubscribedEventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000307 /* SubscribedEventDetailView.swift */; };
+		100000000000000000000401 /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000401 /* SettingsWindowController.swift */; };
+		100000000000000000000402 /* AppearanceSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000402 /* AppearanceSettingsView.swift */; };
+		100000000000000000000403 /* GeneralSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000403 /* GeneralSettingsView.swift */; };
+		100000000000000000000405 /* ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000405 /* ViewState.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -99,6 +110,17 @@
 		200000000000000000000207 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		200000000000000000000208 /* build_and_run.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build_and_run.sh; sourceTree = "<group>"; };
 		574626613018F58D00375A03 /* menucal.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = menucal.icon; sourceTree = "<group>"; };
+		200000000000000000000301 /* CalendarSubscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CalendarSubscription.swift"; sourceTree = "<group>"; };
+		200000000000000000000302 /* CalendarFeedClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CalendarFeedClient.swift"; sourceTree = "<group>"; };
+		200000000000000000000303 /* ICalendarParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ICalendar/ICalendarParser.swift"; sourceTree = "<group>"; };
+		200000000000000000000304 /* ICalendarRecurrence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ICalendar/ICalendarRecurrence.swift"; sourceTree = "<group>"; };
+		200000000000000000000305 /* CalendarSubscriptionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CalendarSubscriptionStore.swift"; sourceTree = "<group>"; };
+		200000000000000000000306 /* CalendarSubscriptionsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CalendarSubscriptionsSettingsView.swift"; sourceTree = "<group>"; };
+		200000000000000000000307 /* SubscribedEventDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SubscribedEventDetailView.swift"; sourceTree = "<group>"; };
+		200000000000000000000401 /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
+		200000000000000000000402 /* AppearanceSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSettingsView.swift; sourceTree = "<group>"; };
+		200000000000000000000403 /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
+		200000000000000000000405 /* ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewState.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -152,6 +174,7 @@
 		300000000000000000000003 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				200000000000000000000401 /* SettingsWindowController.swift */,
 				200000000000000000000001 /* MenuCalApp.swift */,
 				200000000000000000000002 /* StatusItemController.swift */,
 			);
@@ -161,6 +184,7 @@
 		300000000000000000000004 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				200000000000000000000301 /* CalendarSubscription.swift */,
 				200000000000000000000017 /* AppRelease.swift */,
 				200000000000000000000003 /* CalendarAuthorization.swift */,
 				200000000000000000000004 /* CalendarDay.swift */,
@@ -172,6 +196,9 @@
 		300000000000000000000005 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				200000000000000000000304 /* ICalendarRecurrence.swift */,
+				200000000000000000000303 /* ICalendarParser.swift */,
+				200000000000000000000302 /* CalendarFeedClient.swift */,
 				200000000000000000000019 /* AppUpdateService.swift */,
 				200000000000000000000018 /* AppUpdating.swift */,
 				200000000000000000000006 /* CalendarAutomationService.swift */,
@@ -187,6 +214,7 @@
 		300000000000000000000006 /* Stores */ = {
 			isa = PBXGroup;
 			children = (
+				200000000000000000000305 /* CalendarSubscriptionStore.swift */,
 				20000000000000000000001A /* AppUpdateViewModel.swift */,
 				20000000000000000000000C /* CalendarStore.swift */,
 				20000000000000000000000D /* LoginItemViewModel.swift */,
@@ -197,6 +225,7 @@
 		300000000000000000000007 /* Support */ = {
 			isa = PBXGroup;
 			children = (
+				200000000000000000000405 /* ViewState.swift */,
 				20000000000000000000000E /* AppleScriptEscaper.swift */,
 				20000000000000000000000F /* CalendarGridBuilder.swift */,
 				200000000000000000000010 /* CalendarHighlightColor.swift */,
@@ -211,6 +240,10 @@
 		300000000000000000000008 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				200000000000000000000403 /* GeneralSettingsView.swift */,
+				200000000000000000000402 /* AppearanceSettingsView.swift */,
+				200000000000000000000307 /* SubscribedEventDetailView.swift */,
+				200000000000000000000306 /* CalendarSubscriptionsSettingsView.swift */,
 				200000000000000000000015 /* CalendarPopoverView.swift */,
 				200000000000000000000016 /* SettingsView.swift */,
 			);
@@ -373,6 +406,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				100000000000000000000405 /* ViewState.swift in Sources */,
+				100000000000000000000403 /* GeneralSettingsView.swift in Sources */,
+				100000000000000000000402 /* AppearanceSettingsView.swift in Sources */,
+				100000000000000000000401 /* SettingsWindowController.swift in Sources */,
+				100000000000000000000307 /* SubscribedEventDetailView.swift in Sources */,
+				100000000000000000000306 /* CalendarSubscriptionsSettingsView.swift in Sources */,
+				100000000000000000000305 /* CalendarSubscriptionStore.swift in Sources */,
+				100000000000000000000304 /* ICalendarRecurrence.swift in Sources */,
+				100000000000000000000303 /* ICalendarParser.swift in Sources */,
+				100000000000000000000302 /* CalendarFeedClient.swift in Sources */,
+				100000000000000000000301 /* CalendarSubscription.swift in Sources */,
 				100000000000000000000001 /* MenuCalApp.swift in Sources */,
 				100000000000000000000002 /* StatusItemController.swift in Sources */,
 				100000000000000000000003 /* CalendarAuthorization.swift in Sources */,
@@ -548,7 +592,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2026091701;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = NO;
@@ -559,7 +603,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.elliana.MenuCal;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = macosx;
@@ -576,7 +620,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2026091701;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = NO;
@@ -587,7 +631,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.elliana.MenuCal;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = macosx;

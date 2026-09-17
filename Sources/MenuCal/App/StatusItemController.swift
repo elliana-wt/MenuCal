@@ -1,4 +1,5 @@
 import AppKit
+import Combine
 import SwiftUI
 
 @MainActor
@@ -8,13 +9,17 @@ final class StatusItemController: NSObject {
     private let eventService: EventKitService
     private let calendarOpener: CalendarAutomationService
     private var clockTimer: Timer?
+    private var subscriptionObservation: AnyCancellable?
+    private let onOpenSettings: () -> Void
 
     init(
         eventService: EventKitService = EventKitService(),
-        calendarOpener: CalendarAutomationService = CalendarAutomationService()
+        calendarOpener: CalendarAutomationService = CalendarAutomationService(),
+        onOpenSettings: @escaping () -> Void = {}
     ) {
         self.eventService = eventService
         self.calendarOpener = calendarOpener
+        self.onOpenSettings = onOpenSettings
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         super.init()
 
@@ -23,6 +28,9 @@ final class StatusItemController: NSObject {
         configureStatusItem()
         configurePopover()
         observeChanges()
+        subscriptionObservation = CalendarSubscriptionStore.shared.objectWillChange.sink { [weak self] _ in
+            Task { @MainActor [weak self] in self?.updatePopoverSize() }
+        }
         startClock()
         updateClock()
     }
@@ -47,28 +55,42 @@ final class StatusItemController: NSObject {
     private func observeChanges() {
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(preferencesDidChange),
+            selector: #selector(preferencesChangeNotificationReceived),
             name: UserDefaults.didChangeNotification,
             object: nil
         )
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(updateClock),
+            selector: #selector(clockUpdateNotificationReceived),
             name: .NSSystemTimeZoneDidChange,
             object: nil
         )
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(updateClock),
+            selector: #selector(clockUpdateNotificationReceived),
             name: .NSCalendarDayChanged,
             object: nil
         )
         NSWorkspace.shared.notificationCenter.addObserver(
             self,
-            selector: #selector(updateClock),
+            selector: #selector(clockUpdateNotificationReceived),
             name: NSWorkspace.didWakeNotification,
             object: nil
         )
+    }
+
+    @objc
+    nonisolated private func clockUpdateNotificationReceived(_ notification: Notification) {
+        Task { @MainActor [weak self] in
+            self?.updateClock()
+        }
+    }
+
+    @objc
+    nonisolated private func preferencesChangeNotificationReceived(_ notification: Notification) {
+        Task { @MainActor [weak self] in
+            self?.preferencesDidChange()
+        }
     }
 
     private func startClock() {
@@ -169,7 +191,8 @@ final class StatusItemController: NSObject {
             ),
             height: CalendarLayoutMetrics.popoverHeight(
                 verticalSpacingPixels: verticalSpacingPixels,
-                showsEvents: showsEvents
+                showsEvents: showsEvents,
+                showsDayAnnotations: CalendarSubscriptionStore.shared.showsHolidays
             )
         )
         guard popover.contentSize != contentSize else {
@@ -212,7 +235,11 @@ final class StatusItemController: NSObject {
         NSApp.activate(ignoringOtherApps: true)
         let rootView = CalendarPopoverView(
             provider: eventService,
-            calendarOpener: calendarOpener
+            calendarOpener: calendarOpener,
+            onOpenSettings: { [weak self] in
+                self?.popover.performClose(nil)
+                self?.onOpenSettings()
+            }
         )
         popover.contentViewController = NSHostingController(rootView: rootView)
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)

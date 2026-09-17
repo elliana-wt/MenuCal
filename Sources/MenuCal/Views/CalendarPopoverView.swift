@@ -3,10 +3,14 @@ import SwiftUI
 
 @MainActor
 struct CalendarPopoverView: View {
+    @ObservedObject private var subscriptions = CalendarSubscriptionStore.shared
+    @ViewState private var timeZoneRevision = 0
+    @ViewState private var subscribedEvents: [SubscribedCalendarEvent] = []
+    @ViewState private var selectedSubscribedEvent: SubscribedCalendarEvent?
     @StateObject private var store: CalendarStore
-    @State private var selectedDate: Date
-    @State private var displayedMonth: Date
-    @State private var automationError: String?
+    @ViewState private var selectedDate: Date
+    @ViewState private var displayedMonth: Date
+    @ViewState private var automationError: String?
     @AppStorage(PreferenceKeys.calendarDayHorizontalSpacingPixels)
     private var dayHorizontalSpacingPixels =
         PreferenceKeys.defaultCalendarDayHorizontalSpacingPixels
@@ -18,13 +22,19 @@ struct CalendarPopoverView: View {
 
     private let calendar = Calendar.autoupdatingCurrent
     private let calendarOpener: any CalendarOpening
+    private let onOpenSettings: () -> Void
 
-    init(provider: any EventProviding, calendarOpener: any CalendarOpening) {
+    init(
+        provider: any EventProviding,
+        calendarOpener: any CalendarOpening,
+        onOpenSettings: @escaping () -> Void = {}
+    ) {
         let today = Date()
         _store = StateObject(wrappedValue: CalendarStore(provider: provider))
         _selectedDate = State(initialValue: today)
         _displayedMonth = State(initialValue: today)
         self.calendarOpener = calendarOpener
+        self.onOpenSettings = onOpenSettings
     }
 
     var body: some View {
@@ -40,6 +50,9 @@ struct CalendarPopoverView: View {
                 displayedMonth: displayedMonth,
                 selectedDate: selectedDate,
                 calendar: calendar,
+                subscribedEvents: subscribedEvents,
+                showsHolidays: subscriptions.showsHolidays,
+                showsEvents: showsEvents,
                 onSelect: selectDate
             )
             .padding(.horizontal, 16)
@@ -49,6 +62,9 @@ struct CalendarPopoverView: View {
                 EventListView(
                     selectedDate: selectedDate,
                     store: store,
+                    subscribedEvents: subscribedEvents.filter { $0.occurs(on: selectedDate, calendar: calendar) },
+                    hasPersonalSubscriptions: subscriptions.subscriptions.contains { !$0.isBuiltIn && $0.isEnabled },
+                    onOpenSubscription: { selectedSubscribedEvent = $0 },
                     onOpenEvent: openEvent
                 )
                 .frame(height: CalendarLayoutMetrics.eventListHeight)
@@ -63,6 +79,16 @@ struct CalendarPopoverView: View {
         .calendarPopoverSurface()
         .task {
             refreshEventsIfShown()
+            await subscriptions.refreshAll()
+        }
+        .task(id: "\(displayedMonth.timeIntervalSince1970)-\(subscriptions.revision)-\(timeZoneRevision)") {
+            await refreshSubscribedEvents()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .NSSystemTimeZoneDidChange)) { _ in
+            timeZoneRevision += 1
+        }
+        .popover(item: $selectedSubscribedEvent) { event in
+            SubscribedEventDetailView(event: event)
         }
         .onChange(of: selectedDate) { _, newDate in
             refreshEventsIfShown(for: newDate)
@@ -90,7 +116,7 @@ struct CalendarPopoverView: View {
 
     private var footer: some View {
         HStack {
-            SettingsLink {
+            Button(action: onOpenSettings) {
                 Label("设置", systemImage: "gearshape")
             }
             .buttonStyle(.plain)
@@ -120,8 +146,18 @@ struct CalendarPopoverView: View {
     private var popoverHeight: CGFloat {
         CalendarLayoutMetrics.popoverHeight(
             verticalSpacingPixels: dayVerticalSpacingPixels,
-            showsEvents: showsEvents
+            showsEvents: showsEvents,
+            showsDayAnnotations: subscriptions.showsHolidays
         )
+    }
+
+    private func refreshSubscribedEvents() async {
+        let days = CalendarGridBuilder(calendar: calendar).days(containing: displayedMonth)
+        guard let first = days.first?.date, let last = days.last?.date,
+              let end = calendar.date(byAdding: .day, value: 1, to: last) else { return }
+        let events = await subscriptions.events(in: DateInterval(start: first, end: end))
+        guard !Task.isCancelled else { return }
+        subscribedEvents = events
     }
 
     private func refreshEventsIfShown(for date: Date? = nil) {
@@ -200,6 +236,9 @@ private struct MonthGridView: View {
     let displayedMonth: Date
     let selectedDate: Date
     let calendar: Calendar
+    let subscribedEvents: [SubscribedCalendarEvent]
+    let showsHolidays: Bool
+    let showsEvents: Bool
     let onSelect: (Date) -> Void
     @AppStorage(PreferenceKeys.calendarDayFontSizePixels)
     private var dayFontSizePixels = PreferenceKeys.defaultCalendarDayFontSizePixels
@@ -292,26 +331,40 @@ private struct MonthGridView: View {
     private func dayButton(_ day: CalendarDay) -> some View {
         let isSelected = calendar.isDate(day.date, inSameDayAs: selectedDate)
 
+        let events = subscribedEvents.filter { $0.occurs(on: day.date, calendar: calendar) }
+        let holiday = events.filter { $0.holidayLabel != nil }.min { $0.holidayPriority < $1.holidayPriority }
+        let hasPersonalEvents = showsEvents && events.contains { !$0.isBuiltIn }
+
         return Button {
             onSelect(day.date)
         } label: {
-            Text(String(calendar.component(.day, from: day.date)))
-                .font(
-                    .system(
-                        size: dayFontSize,
-                        weight: day.isToday || isSelected ? .semibold : .regular
-                    )
-                )
-                .foregroundStyle(foregroundStyle(for: day, isSelected: isSelected))
-                .frame(width: dayCellSize, height: dayCellSize)
-                .background {
-                    Circle()
-                        .fill(backgroundStyle(for: day, isSelected: isSelected))
+            VStack(spacing: 0) {
+                Text(String(calendar.component(.day, from: day.date)))
+                    .font(.system(size: dayFontSize, weight: day.isToday || isSelected ? .semibold : .regular))
+                    .foregroundStyle(foregroundStyle(for: day, isSelected: isSelected))
+                    .frame(width: dayCellSize, height: dayCellSize)
+                    .background { Circle().fill(backgroundStyle(for: day, isSelected: isSelected)) }
+                    .overlay(alignment: .bottom) {
+                        if hasPersonalEvents {
+                            Circle().fill(isSelected || day.isToday ? highlightForegroundColor : highlightColor)
+                                .frame(width: 3, height: 3).padding(.bottom, 2)
+                        }
+                    }
+                if showsHolidays {
+                    Text(holiday?.holidayLabel ?? " ")
+                        .font(.system(size: 8, weight: .medium))
+                        .foregroundStyle(holiday?.specialDay == "ALTERNATE-WORKDAY" ? Color.orange : Color.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                        .frame(width: dayCellSize, height: 16)
+                        .opacity(day.isInDisplayedMonth ? 1 : 0.5)
                 }
-                .contentShape(Circle())
+            }
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .help(day.date.formatted(date: .long, time: .omitted))
+        .help(([day.date.formatted(date: .long, time: .omitted)] + events.map { $0.summary.title }).joined(separator: "\n"))
+        .accessibilityLabel(([day.date.formatted(date: .long, time: .omitted)] + events.map { $0.summary.title }).joined(separator: "，"))
     }
 
     private func foregroundStyle(for day: CalendarDay, isSelected: Bool) -> Color {
@@ -335,6 +388,9 @@ private struct MonthGridView: View {
 private struct EventListView: View {
     let selectedDate: Date
     @ObservedObject var store: CalendarStore
+    let subscribedEvents: [SubscribedCalendarEvent]
+    let hasPersonalSubscriptions: Bool
+    let onOpenSubscription: (SubscribedCalendarEvent) -> Void
     let onOpenEvent: (CalendarEventSummary) -> Void
 
     var body: some View {
@@ -345,18 +401,33 @@ private struct EventListView: View {
                 .padding(.top, 12)
 
             Group {
-                switch store.authorization {
-                case .notDetermined:
-                    permissionPrompt
-                case .denied, .restricted:
-                    deniedPrompt
-                case .fullAccess:
+                if hasPersonalSubscriptions || !subscribedEvents.isEmpty {
                     eventContent
+                } else {
+                    switch store.authorization {
+                    case .notDetermined:
+                        permissionPrompt
+                    case .denied, .restricted:
+                        deniedPrompt
+                    case .fullAccess:
+                        eventContent
+                    }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var combinedEvents: [CalendarEventSummary] {
+        let subscribed = subscribedEvents.map(\.summary)
+        let system = store.events.filter { event in
+            !subscribed.contains {
+                $0.startDate == event.startDate && $0.endDate == event.endDate &&
+                    ($0.externalIdentifier != nil && $0.externalIdentifier == event.externalIdentifier)
+            }
+        }
+        return CalendarEventSummary.sortedForDisplay(system + subscribed)
     }
 
     private var permissionPrompt: some View {
@@ -387,25 +458,44 @@ private struct EventListView: View {
         }
     }
 
+    private var systemCalendarButton: some View {
+        Button(store.authorization == .notDetermined ? "同时显示系统日历…" : "允许访问系统日历…") {
+            if store.authorization == .notDetermined {
+                Task { await store.requestAccess(for: selectedDate) }
+            } else { SystemSettingsOpener.openCalendarPrivacy() }
+        }
+    }
+
     @ViewBuilder
     private var eventContent: some View {
         if store.isLoading {
             ProgressView()
-        } else if store.events.isEmpty {
+        } else if combinedEvents.isEmpty {
             CalendarUnavailableView(
                 title: "没有日程",
                 systemImage: "calendar",
                 description: "这一天暂时没有安排"
             ) {
-                EmptyView()
+                if store.authorization != .fullAccess {
+                    systemCalendarButton
+                }
             }
         } else {
             ScrollView {
                 LazyVStack(spacing: 2) {
-                    ForEach(store.events) { event in
-                        EventRow(event: event) {
-                            onOpenEvent(event)
+                    ForEach(combinedEvents) { event in
+                        let subscription = subscribedEvents.first { $0.id == event.id }
+                        EventRow(event: event, isSubscription: subscription != nil) {
+                            if let subscription { onOpenSubscription(subscription) }
+                            else { onOpenEvent(event) }
                         }
+                    }
+                    if store.authorization != .fullAccess {
+                        systemCalendarButton
+                        .font(.caption)
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.secondary)
+                        .padding(8)
                     }
                 }
                 .padding(.horizontal, 10)
@@ -459,6 +549,7 @@ private struct CalendarUnavailableView<Actions: View>: View {
 
 private struct EventRow: View {
     let event: CalendarEventSummary
+    var isSubscription = false
     let action: () -> Void
 
     var body: some View {
@@ -488,7 +579,7 @@ private struct EventRow: View {
 
                 Spacer(minLength: 0)
 
-                Image(systemName: "arrow.up.forward.app")
+                Image(systemName: isSubscription ? "info.circle" : "arrow.up.forward.app")
                     .font(.system(size: 11))
                     .foregroundStyle(.tertiary)
             }
